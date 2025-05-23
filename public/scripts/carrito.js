@@ -1,3 +1,4 @@
+// 📦 TianguiStore - carrito.js
 const BASE_URL = window.location.origin;
 const token = localStorage.getItem("token");
 
@@ -5,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   mostrarCarrito();
   actualizarContadorCarrito();
 
+  // Botón: Proceder al pago
   const btnPagar = document.getElementById("btnRealizarPedido");
   if (btnPagar) {
     btnPagar.addEventListener("click", () => {
@@ -17,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Botón: Vaciar carrito
   const btnVaciar = document.getElementById("vaciar-carrito");
   if (btnVaciar) {
     btnVaciar.addEventListener("click", () => {
@@ -28,97 +31,98 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+/* ══════════════════════════════════════════════
+   🛒 Mostrar contenido del carrito
+══════════════════════════════════════════════ */
 function mostrarCarrito() {
   const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
   const lista = document.getElementById("lista-carrito");
   const totalLabel = document.getElementById("total_etiqueta");
+  const subtotalLabel = document.getElementById("resumen-subtotal");
+  const ivaLabel = document.getElementById("resumen-iva");
 
-  if (!lista || !totalLabel) return;
+  if (!lista || !totalLabel || !subtotalLabel || !ivaLabel) return;
 
   lista.innerHTML = "";
-
   if (carrito.length === 0) {
-    lista.innerHTML = `<p class='text-center text-muted'>🛒 Tu carrito está vacío.</p>`;
+    lista.innerHTML = `<li class='collection-item center-align grey-text text-lighten-1'>🛒 Tu carrito está vacío.</li>`;
+    subtotalLabel.textContent = "$0.00";
+    ivaLabel.textContent = "$0.00";
     totalLabel.textContent = "Total: $0.00";
     return;
   }
 
-  let total = 0;
+  let subtotal = 0;
+  const IVA_PORCENTAJE = 0.16;
 
   carrito.forEach(producto => {
     const precio = parseFloat(producto.precio) || 0;
-    const subtotal = precio * producto.cantidad;
-    total += subtotal;
+    const cantidad = producto.cantidad || 1;
+    const itemSubtotal = precio * cantidad;
+    subtotal += itemSubtotal;
 
     const imagenUrl = producto.imagen_url?.startsWith("http")
       ? producto.imagen_url
       : `${BASE_URL}/${producto.imagen_url?.replace(/^\/+/, "") || "imagenes/default.png"}`;
 
     const item = document.createElement("li");
-    item.className = "list-group-item d-flex align-items-center shadow-sm p-3 rounded";
+    item.className = "collection-item grey darken-4 white-text";
 
-    const img = document.createElement("img");
-    img.src = imagenUrl;
-    img.alt = producto.nombre;
-    img.className = "img-thumbnail me-3 rounded-circle";
-    img.style = "width: 60px; height: 60px; object-fit: cover;";
-    img.onerror = () => {
-      img.src = `${BASE_URL}/imagenes/default.png`;
-    };
+    const contenido = `
+      <div class="row valign-wrapper">
+        <div class="col s3 center-align">
+          <img src="${imagenUrl}" alt="${producto.nombre}" class="responsive-img circle z-depth-2" 
+            style="width: 72px; height: 72px; object-fit: cover;" 
+            onerror="this.src='${BASE_URL}/imagenes/default.png';" />
+        </div>
+        <div class="col s9">
+          <h6 class="truncate white-text">${producto.nombre}</h6>
+          <p class="grey-text text-lighten-1">
+            Precio: <strong class="teal-text">$${precio.toFixed(2)}</strong> | 
+            Subtotal: <strong class="green-text">$${itemSubtotal.toFixed(2)}</strong>
+          </p>
+          <div class="center-align">
+            <button class="btn-floating btn-small red darken-2 disminuir-cantidad" data-id="${producto.id}">
+              <i class="fas fa-minus"></i>
+            </button>
+            <span class="mx-2 white-text">${cantidad}</span>
+            <button class="btn-floating btn-small green darken-2 aumentar-cantidad" data-id="${producto.id}">
+              <i class="fas fa-plus"></i>
+            </button>
+            <button class="btn-flat btn-small white-text red-text eliminar-producto" data-id="${producto.id}">
+              <i class="fas fa-trash-alt left"></i> Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
 
-    const nombre = document.createElement("h6");
-    nombre.className = "mb-1 text-primary fw-bold";
-    nombre.textContent = producto.nombre;
-
-    const precios = document.createElement("small");
-    precios.className = "text-muted";
-    precios.innerHTML = `Precio: <span class="text-light fw-bold">$${precio.toFixed(2)}</span> |
-                         Subtotal: <span class="text-success fw-bold">$${subtotal.toFixed(2)}</span>`;
-
-    const texto = document.createElement("div");
-    texto.className = "flex-grow-1";
-    texto.appendChild(nombre);
-    texto.appendChild(precios);
-
-    const btnDisminuir = document.createElement("button");
-    btnDisminuir.className = "btn btn-outline-danger btn-sm disminuir-cantidad rounded-circle me-2";
-    btnDisminuir.innerHTML = `<i class="fas fa-minus"></i>`;
-    btnDisminuir.dataset.id = producto.id;
-    btnDisminuir.addEventListener("click", () => modificarCantidad(producto.id, -1));
-
-    const cantidad = document.createElement("span");
-    cantidad.className = "mx-2 cantidad-producto fw-bold text-light";
-    cantidad.textContent = producto.cantidad;
-
-    const btnAumentar = document.createElement("button");
-    btnAumentar.className = "btn btn-outline-success btn-sm aumentar-cantidad rounded-circle ms-2";
-    btnAumentar.innerHTML = `<i class="fas fa-plus"></i>`;
-    btnAumentar.dataset.id = producto.id;
-    btnAumentar.addEventListener("click", () => modificarCantidad(producto.id, 1));
-
-    const acciones = document.createElement("div");
-    acciones.className = "d-flex align-items-center";
-    acciones.appendChild(btnDisminuir);
-    acciones.appendChild(cantidad);
-    acciones.appendChild(btnAumentar);
-
-    const btnEliminar = document.createElement("button");
-    btnEliminar.className = "btn btn-outline-danger btn-sm eliminar-producto ms-3 px-3 rounded-pill";
-    btnEliminar.innerHTML = `<i class="fas fa-trash-alt"></i> Eliminar`;
-    btnEliminar.dataset.id = producto.id;
-    btnEliminar.addEventListener("click", () => eliminarProducto(producto.id));
-
-    item.appendChild(img);
-    item.appendChild(texto);
-    item.appendChild(acciones);
-    item.appendChild(btnEliminar);
-
+    item.innerHTML = contenido;
     lista.appendChild(item);
   });
 
+  const iva = subtotal * IVA_PORCENTAJE;
+  const total = subtotal + iva;
+
+  subtotalLabel.textContent = `$${subtotal.toFixed(2)}`;
+  ivaLabel.textContent = `$${iva.toFixed(2)}`;
   totalLabel.textContent = `Total: $${total.toFixed(2)}`;
+
+  // Reasignar listeners
+  document.querySelectorAll(".disminuir-cantidad").forEach(btn =>
+    btn.addEventListener("click", () => modificarCantidad(btn.dataset.id, -1))
+  );
+  document.querySelectorAll(".aumentar-cantidad").forEach(btn =>
+    btn.addEventListener("click", () => modificarCantidad(btn.dataset.id, 1))
+  );
+  document.querySelectorAll(".eliminar-producto").forEach(btn =>
+    btn.addEventListener("click", () => eliminarProducto(btn.dataset.id))
+  );
 }
 
+/* ══════════════════════════════════════════════
+   🔄 Modificar cantidad
+══════════════════════════════════════════════ */
 function modificarCantidad(id, cambio) {
   let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
   const index = carrito.findIndex(p => p.id === id);
@@ -131,6 +135,9 @@ function modificarCantidad(id, cambio) {
   }
 }
 
+/* ══════════════════════════════════════════════
+   🗑️ Eliminar producto
+══════════════════════════════════════════════ */
 function eliminarProducto(id) {
   let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
   carrito = carrito.filter(p => p.id !== id);
@@ -140,12 +147,18 @@ function eliminarProducto(id) {
   mostrarToast("Producto eliminado del carrito.", "danger");
 }
 
+/* ══════════════════════════════════════════════
+   🔢 Contador carrito
+══════════════════════════════════════════════ */
 function actualizarContadorCarrito() {
   const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
   const total = carrito.reduce((sum, p) => sum + p.cantidad, 0);
   document.querySelectorAll("#contador-carrito").forEach(el => el.textContent = total);
 }
 
+/* ══════════════════════════════════════════════
+   🔔 Toast UI
+══════════════════════════════════════════════ */
 function mostrarToast(mensaje, tipo = "success") {
   const container = document.getElementById("toast-container") || crearContenedorToasts();
   const toast = document.createElement("div");
@@ -170,6 +183,9 @@ function crearContenedorToasts() {
   return div;
 }
 
+/* ══════════════════════════════════════════════
+   ✅ Validar stock en checkout
+══════════════════════════════════════════════ */
 async function validarStockAntesDeCheckout() {
   const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
   const errores = [];
@@ -197,7 +213,6 @@ async function validarStockAntesDeCheckout() {
     return;
   }
 
-  // Stock validado exitosamente
   localStorage.setItem("checkout_validado", "true");
   window.location.href = `${BASE_URL}/checkout.html`;
 }

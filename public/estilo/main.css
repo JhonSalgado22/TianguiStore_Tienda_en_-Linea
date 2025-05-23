@@ -1,23 +1,31 @@
+/* LESS generado y corregido para TianguiStore - Estilo Glassmorphism Oscuro Mejorado */
+/* Incluye fondo animado, sombras refinadas, tarjetas responsivas, y botones refinados */
+/* Listo para compilar a CSS con herramientas como lessc */
 /* =======================================================
-   Estilos principales de TianguiStore con tema oscuro premium
+   🎨 TianguiStore - Estilo Oscuro Glassmorphism Mejorado
    ======================================================= */
-/* ========== VARIABLES ========= */
-/* ========== BASE ========= */
+/* ========== 🎨 VARIABLES ========= */
+/* ========== 🧱 BASE ========= */
 body {
-  background-color: #0d0d0d;
-  color: #e0e0e0;
+  background-color: #0a0a0a;
+  background-image: url('../imagenes/patron_dark.png');
+  background-size: 160px;
+  background-attachment: fixed;
+  background-repeat: repeat;
+  color: #d8d8d8;
   font-family: 'Roboto', sans-serif;
   margin: 0;
   padding: 0;
   line-height: 1.6;
   animation: fadeIn 0.6s ease-in-out;
 }
+/* Enlaces */
 a {
-  color: #08e3ff;
+  color: #00d0ea;
   transition: color 0.3s;
 }
 a:hover {
-  color: #00BCD4;
+  color: #00acc1;
 }
 /* ========== TIPOGRAFÍA ========= */
 h1,
@@ -34,79 +42,125 @@ h6 {
 p,
 span,
 label {
-  color: #b0b0b0;
+  color: #999999;
 }
-/* ========== NAVBAR Y FOOTER GLASS ========= */
+/* ========== NAVBAR y FOOTER ========= */
 nav,
 footer.page-footer {
-  background-color: rgba(18, 18, 18, 0.85) !important;
+  background-color: rgba(20, 20, 20, 0.75) !important;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  z-index: 1000;
 }
-/* ========== CONTENEDOR DE PRODUCTOS EN GRID ========= */
+/* LOGO Y NOMBRE */
+.brand-logo {
+  display: flex !important;
+  align-items: center;
+  max-width: 260px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.brand-logo img {
+  width: 36px;
+  height: 36px;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+.brand-logo span {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: white;
+}
+/* DROPDOWN CORRECTO */
+.dropdown-content.glass-dropdown {
+  background-color: rgba(20, 20, 20, 0.75);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  color: #d8d8d8;
+  max-height: none !important;
+  overflow-y: visible !important;
+  z-index: 1002 !important;
+}
+.dropdown-content.glass-dropdown li > a {
+  color: #d8d8d8 !important;
+  display: flex;
+  align-items: center;
+  padding: 0.8rem 1.2rem;
+}
+.dropdown-content.glass-dropdown li > a i {
+  margin-right: 8px;
+}
+.dropdown-content.glass-dropdown li:hover {
+  background-color: rgba(35, 35, 35, 0.75);
+}
+/* CONTENEDOR GRID */
 #productos-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2.5rem;
+  gap: 2rem;
   padding: 3rem 1rem;
 }
-/* ========== TARJETAS DE PRODUCTO ELEGANTES ========= */
+/* TARJETA DE PRODUCTO */
 .card.producto {
-  background-color: rgba(18, 18, 18, 0.85);
+  background-color: rgba(20, 20, 20, 0.75);
   backdrop-filter: blur(16px);
-  border-radius: 1rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   animation: scaleIn 0.4s ease;
-}
-.card.producto:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 16px 40px rgba(0, 188, 212, 0.25);
+  height: 100%;
+  min-height: 440px;
 }
 .card.producto .producto-imagen {
   width: 100%;
   max-width: 160px;
   height: 160px;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 0.75rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
   margin-bottom: 1.2rem;
-  background-color: #1a1a1a;
+  background-color: rgba(20, 20, 20, 0.95);
 }
 .card.producto .card-title {
   font-size: 1.1rem;
   font-weight: bold;
-  color: #fafafa;
+  color: #f2f2f2;
   margin-bottom: 0.5rem;
   text-align: center;
+  line-height: 1.4;
+  min-height: 2.6rem;
 }
 .card.producto .card-info {
   font-size: 0.95rem;
-  color: #b0b0b0;
-  margin-bottom: 0.4rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  color: #999999;
+  margin-bottom: 0.8rem;
+  text-align: left;
+  line-height: 1.5;
+  max-width: 100%;
+  white-space: normal;
 }
-.card.producto .card-info i {
-  color: #00BCD4;
+.card.producto .card-precio {
+  font-size: 1rem;
+  color: #d8d8d8;
+  margin-bottom: 1rem;
 }
 .card.producto .btn-agregar {
-  margin-top: 1rem;
-  background-color: #00BCD4;
-  color: #0d0d0d;
+  margin-top: auto;
+  background-color: #00acc1;
+  color: #0a0a0a;
   font-weight: 600;
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   padding: 0.7rem 1.2rem;
   width: 100%;
   display: flex;
-  align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
 }
@@ -114,21 +168,21 @@ footer.page-footer {
   margin-right: 0.5rem;
 }
 .card.producto .btn-agregar:hover {
-  background-color: #008fa1;
+  background-color: #007f8e;
   transform: scale(1.04);
 }
-/* ========== BOTONES GENÉRICOS ========= */
+/* BOTONES */
 .btn {
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   font-weight: 500;
   transition: all 0.3s ease;
 }
 .btn.amber {
-  background-color: #00BCD4;
-  color: #0d0d0d;
+  background-color: #00acc1;
+  color: #0a0a0a;
 }
 .btn.amber:hover {
-  background-color: #008fa1;
+  background-color: #007f8e;
 }
 .btn.danger {
   background-color: #e53935;
@@ -142,12 +196,12 @@ footer.page-footer {
 .btn.secondary:hover {
   background-color: #424242;
 }
-/* ========== SECCIONES ========= */
+/* SECCIONES */
 .section {
   padding: 4rem 2rem;
   animation: fadeUp 0.6s ease;
 }
-/* ========== TOASTS ========= */
+/* TOASTS */
 #toast-container {
   position: fixed;
   bottom: 1rem;
@@ -155,14 +209,14 @@ footer.page-footer {
   z-index: 10000;
 }
 #toast-container .toast {
-  background-color: #00BCD4;
+  background-color: #00acc1;
   color: black;
-  border-radius: 1rem;
+  border-radius: 0.75rem;
   padding: 1rem 1.5rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   animation: fadeInDown 0.5s ease;
 }
-/* ========== ANIMACIONES ========= */
+/* ANIMACIONES */
 @keyframes fadeIn {
   0% {
     opacity: 0;
@@ -199,17 +253,5 @@ footer.page-footer {
   100% {
     transform: scale(1);
     opacity: 1;
-  }
-}
-/* ========== RESPONSIVE ========= */
-@media screen and (max-width: 600px) {
-  .card {
-    padding: 1rem;
-  }
-  .card-title {
-    font-size: 1.2rem;
-  }
-  .btn {
-    font-size: 0.95rem;
   }
 }

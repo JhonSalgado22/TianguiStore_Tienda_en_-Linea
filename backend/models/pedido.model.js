@@ -6,10 +6,6 @@ const db = require("../db/connection");
    Incluye llamadas al SP `sp_crear_pedido_completo`
    ════════════════════════════════════════════════════════ */
 
-/**
- * 📋 Obtener todos los pedidos activos (admin o gerente)
- * Incluye nombre del usuario y estado del pedido.
- */
 async function obtenerPedidos() {
   const [rows] = await db.query(`
     SELECT p.*, 
@@ -25,9 +21,6 @@ async function obtenerPedidos() {
   return rows;
 }
 
-/**
- * 🔍 Obtener todos los pedidos del usuario autenticado.
- */
 async function obtenerMisPedidos(usuario_id) {
   const [rows] = await db.query(
     `
@@ -43,11 +36,6 @@ async function obtenerMisPedidos(usuario_id) {
   return rows;
 }
 
-/**
- * 🧾 Crear pedido completo desde frontend utilizando SP
- * Ejecuta el procedimiento almacenado con datos validados.
- * También maneja errores detallados desde MySQL.
- */
 async function crearPedidoConSP({
   usuario_id,
   total,
@@ -71,9 +59,7 @@ async function crearPedidoConSP({
 
   try {
     const [resultado] = await db.query(
-      `
-      CALL sp_crear_pedido_completo(?, ?, ?, ?, ?, ?, ?)
-    `,
+      `CALL sp_crear_pedido_completo(?, ?, ?, ?, ?, ?, ?)`,
       [
         parseInt(usuario_id),
         parseFloat(total),
@@ -89,93 +75,87 @@ async function crearPedidoConSP({
       resultado?.[0]?.pedido_id || resultado?.[0]?.[0]?.pedido_id || null;
 
     if (!pedido_id) {
-      throw new Error(
-        "⚠️ El procedimiento almacenado no devolvió un ID válido."
-      );
+      throw new Error("⚠️ El procedimiento almacenado no devolvió un ID válido.");
     }
 
     return pedido_id;
   } catch (error) {
-    const mensajeOriginal =
-      error?.sqlMessage ||
-      error?.message ||
-      "Error desconocido al registrar pedido.";
+    const mensajeOriginal = error?.sqlMessage || error?.message || "Error desconocido al registrar pedido.";
+    const sqlstate = error?.sqlState || null;
+    const errno = error?.errno || null;
 
-    // 💬 Si el SP devolvió "mensajeUsuario|||mensajeTecnico"
+    let mensajeUsuario = "❌ No fue posible registrar el pedido.";
+    let mensajeTecnico = mensajeOriginal;
+
     if (mensajeOriginal.includes("|||")) {
-      const [mensajeUsuario, mensajeTecnico] = mensajeOriginal.split("|||");
-
-      const logIdMatch = mensajeUsuario.match(/#ERR\d+/);
-      const log_id = logIdMatch ? logIdMatch[0] : "NO_ID";
-
-      console.error("🛠️ [Pedido::SP Error Detallado]", {
-        log_id,
-        mensajeUsuario: mensajeUsuario.trim(),
-        mensajeTecnico: mensajeTecnico.trim(),
-        usuario_id,
-        total,
-        metodo_pago,
-        productos: productos_sanitizados,
-      });
-
-      throw new Error(`${mensajeUsuario.trim()}`);
-    } else {
-      console.error("🛠️ [Pedido::SP Error Genérico]:", mensajeOriginal);
-      throw new Error(
-        "❌ No fue posible registrar el pedido. Intenta nuevamente."
-      );
+      [mensajeUsuario, mensajeTecnico] = mensajeOriginal.split("|||");
     }
+
+    const datosEntrada = {
+      usuario_id,
+      total,
+      metodo_pago,
+      cupon,
+      direccion_envio,
+      notas,
+      productos: productos_sanitizados,
+    };
+
+    const [result] = await db.query(
+      `
+      INSERT INTO auditoria_errores (
+        fecha, modulo, procedimiento, usuario_id, datos_entrada,
+        sqlstate, mysql_errno, mensaje
+      ) VALUES (NOW(), ?, ?, ?, ?, ?, ?, ?)
+    `,
+      [
+        "pedido.model.js",
+        "sp_crear_pedido_completo",
+        parseInt(usuario_id),
+        JSON.stringify(datosEntrada),
+        sqlstate,
+        errno,
+        mensajeTecnico.trim(),
+      ]
+    );
+
+    const log_id = result.insertId;
+
+    console.error("🛠️ [Pedido::Error Registrado]", {
+      log_id,
+      sqlstate,
+      errno,
+      mensaje: mensajeTecnico.trim(),
+    });
+
+    throw new Error(`${mensajeUsuario.trim()} (ID error: #${log_id})`);
   }
 }
 
-/**
- * ✏️ Actualiza el estado de un pedido específico.
- */
 async function actualizarEstadoPedido(pedido_id, estado_id) {
   await db.query(
-    `
-    UPDATE pedidos SET estado_id = ? WHERE pedido_id = ?
-  `,
+    `UPDATE pedidos SET estado_id = ? WHERE pedido_id = ?`,
     [parseInt(estado_id), parseInt(pedido_id)]
   );
 }
 
-/**
- * ❌ Realiza el borrado lógico del pedido.
- */
 async function borrarPedidoLogico(pedido_id) {
   await db.query(
-    `
-    UPDATE pedidos SET borrado_logico = 1 WHERE pedido_id = ?
-  `,
+    `UPDATE pedidos SET borrado_logico = 1 WHERE pedido_id = ?`,
     [parseInt(pedido_id)]
   );
 }
 
-/**
- * 🔍 Obtener un pedido específico asegurando pertenencia del usuario.
- */
 async function obtenerPedidoPorId(pedido_id, usuario_id) {
   const [rows] = await db.query(
-    `
-    SELECT * FROM pedidos 
-    WHERE pedido_id = ? AND usuario_id = ? AND borrado_logico = 0
-  `,
+    `SELECT * FROM pedidos 
+     WHERE pedido_id = ? AND usuario_id = ? AND borrado_logico = 0`,
     [parseInt(pedido_id), parseInt(usuario_id)]
   );
-
   return rows[0] || null;
 }
 
-/**
- * 📦 Obtener productos de un pedido, validando acceso por rol.
- * Admins o soporte pueden acceder a cualquier pedido.
- */
-async function obtenerProductosPorPedido(
-  pedido_id,
-  usuario_id,
-  rol = "cliente"
-) {
+async function obtenerProductosPorPedido(pedido_id, usuario_id, rol = "cliente") {
   const isAdmin = ["admin", "soporte"].includes(rol);
 
   const query = `
@@ -193,9 +173,6 @@ async function obtenerProductosPorPedido(
   return rows.length > 0 ? rows : null;
 }
 
-/**
- * 🧾 Obtener todos los productos del carrito de un usuario.
- */
 async function obtenerCarrito(usuario_id) {
   const [rows] = await db.query(
     `
@@ -212,9 +189,6 @@ async function obtenerCarrito(usuario_id) {
   return rows;
 }
 
-/**
- * 🔢 Calcular el total del carrito (productos x precio).
- */
 async function calcularTotalCarrito(usuario_id) {
   const [[{ total }]] = await db.query(
     `
@@ -229,16 +203,8 @@ async function calcularTotalCarrito(usuario_id) {
   return total || 0;
 }
 
-/**
- * 🧹 Elimina todos los productos del carrito tras confirmar compra.
- */
 async function limpiarCarrito(usuario_id) {
-  await db.query(
-    `
-    DELETE FROM carrito WHERE usuario_id = ?
-  `,
-    [parseInt(usuario_id)]
-  );
+  await db.query(`DELETE FROM carrito WHERE usuario_id = ?`, [parseInt(usuario_id)]);
 }
 
 module.exports = {

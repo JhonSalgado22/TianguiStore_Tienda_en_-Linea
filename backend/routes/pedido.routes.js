@@ -1,6 +1,8 @@
+// 📁 routes/pedidos.js
 const express = require("express");
 const router = express.Router();
 
+// 🧩 Controladores
 const {
   obtenerPedidos,
   obtenerMisPedidos,
@@ -10,15 +12,22 @@ const {
   obtenerProductosDelPedido
 } = require("../controllers/pedidoController");
 
+// 🔐 Middlewares de seguridad
 const {
   verificarAutenticacion,
   verificarPermiso
 } = require("../middlewares/authMiddleware");
 
+// 🧪 Validación de datos
 const validarResultados = require("../middlewares/validacion/validarResultados");
 const pedidoSchema = require("../middlewares/validacion/pedidoSchema");
 
-// 📦 Obtener todos los pedidos (solo admin o soporte)
+
+// ════════════════════════════════════════════════════════════════
+// 📦 CONSULTAS DE PEDIDOS
+// ════════════════════════════════════════════════════════════════
+
+// 📄 Obtener todos los pedidos (solo admin o soporte)
 router.get(
   "/",
   verificarAutenticacion,
@@ -26,14 +35,26 @@ router.get(
   obtenerPedidos
 );
 
-// 📦 Obtener solo los pedidos del usuario autenticado (cliente)
+// 🧑‍💼 Obtener los pedidos del usuario autenticado
 router.get(
   "/mis",
   verificarAutenticacion,
   obtenerMisPedidos
 );
 
-// 🛒 Crear pedido desde productos directos (frontend)
+// 🔍 Obtener productos de un pedido específico
+router.get(
+  "/:id/productos",
+  verificarAutenticacion,
+  obtenerProductosDelPedido
+);
+
+
+// ════════════════════════════════════════════════════════════════
+// 🛒 CREACIÓN DE PEDIDOS
+// ════════════════════════════════════════════════════════════════
+
+// 🛍️ Crear pedido desde selección directa de productos
 router.post(
   "/",
   verificarAutenticacion,
@@ -43,7 +64,7 @@ router.post(
   crearPedido
 );
 
-// 🛍️ Crear pedido desde carrito persistido
+// 🛒 Crear pedido desde carrito persistido
 router.post(
   "/desde-carrito",
   verificarAutenticacion,
@@ -53,14 +74,12 @@ router.post(
   crearPedidoDesdeCarrito
 );
 
-// 🧾 Obtener productos de un pedido (cliente o admin)
-router.get(
-  "/:id/productos",
-  verificarAutenticacion,
-  obtenerProductosDelPedido
-);
 
-// ❌ Cancelar un pedido (cliente propio o admin)
+// ════════════════════════════════════════════════════════════════
+// ❌ GESTIÓN Y CANCELACIÓN
+// ════════════════════════════════════════════════════════════════
+
+// ❌ Cancelar pedido (solo si el usuario tiene permiso)
 router.put(
   "/:id/cancelar",
   verificarAutenticacion,

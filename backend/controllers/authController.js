@@ -19,17 +19,30 @@ const {
  * ➕ REGISTRO DE NUEVO USUARIO
  * @route POST /auth/registro
  */
+/**
+ * ➕ REGISTRO DE NUEVO USUARIO (EXTENDIDO)
+ * @route POST /auth/registro
+ */
 async function registrarUsuario(req, res) {
   const {
     correo_electronico,
     contrasena,
+    confirmar_contrasena,
     nombre,
     apellido_paterno = "",
     apellido_materno = "",
     telefono = "",
-    direccion = ""
+    direccion = "",
+    genero = "no_especificado",
+    fecha_nacimiento = null,
+    foto_perfil_url = null,
+    biografia = null,
+    cv_url = null,
+    portafolio_url = null,
+    origen_reclutamiento = "externo"
   } = req.body;
 
+  // 🧾 Validaciones iniciales
   if (!correo_electronico || !contrasena || !nombre) {
     return res.status(400).json({
       message: "Faltan campos obligatorios: correo_electronico, contrasena, nombre."
@@ -38,6 +51,10 @@ async function registrarUsuario(req, res) {
 
   if (!validator.isEmail(correo_electronico)) {
     return res.status(400).json({ message: "Correo electrónico inválido." });
+  }
+
+  if (contrasena !== confirmar_contrasena) {
+    return res.status(400).json({ message: "Las contraseñas no coinciden." });
   }
 
   if (!validator.isStrongPassword(contrasena, {
@@ -50,6 +67,23 @@ async function registrarUsuario(req, res) {
     return res.status(400).json({
       message: "Contraseña débil. Requiere mínimo 8 caracteres, una mayúscula y un número."
     });
+  }
+
+  // Validaciones adicionales
+  if (foto_perfil_url && !validator.isURL(foto_perfil_url)) {
+    return res.status(400).json({ message: "URL de foto de perfil inválida." });
+  }
+
+  if (cv_url && !validator.isURL(cv_url)) {
+    return res.status(400).json({ message: "URL de CV inválida." });
+  }
+
+  if (portafolio_url && !validator.isURL(portafolio_url)) {
+    return res.status(400).json({ message: "URL de portafolio inválida." });
+  }
+
+  if (!["externo", "interno", "campaña", "referido", "fidelidad"].includes(origen_reclutamiento)) {
+    return res.status(400).json({ message: "Origen de reclutamiento no válido." });
   }
 
   try {
@@ -67,7 +101,14 @@ async function registrarUsuario(req, res) {
       apellido_paterno,
       apellido_materno,
       telefono,
-      direccion
+      direccion,
+      genero,
+      fecha_nacimiento,
+      foto_perfil_url,
+      biografia,
+      cv_url,
+      portafolio_url,
+      origen_reclutamiento
     });
 
     return res.status(201).json({ message: "Usuario registrado correctamente." });
@@ -76,6 +117,7 @@ async function registrarUsuario(req, res) {
     return res.status(500).json({ message: "Error interno al registrar usuario." });
   }
 }
+
 
 /**
  * 🔐 INICIO DE SESIÓN

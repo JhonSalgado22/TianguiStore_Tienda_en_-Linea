@@ -402,7 +402,7 @@ DO
 CREATE TABLE IF NOT EXISTS marcas (
   marca_id INT AUTO_INCREMENT PRIMARY KEY,
   nombre_marca VARCHAR(100) NOT NULL UNIQUE COMMENT 'Nombre comercial visible de la marca',
-  slug_marca VARCHAR(100) NOT NULL UNIQUE COMMENT 'Identificador único para URL amigable (sin espacios)',
+  slug_marca VARCHAR(100) UNIQUE COMMENT 'Identificador único para URL amigable (sin espacios)',
   descripcion TEXT COMMENT 'Historia o descripción de la marca',
   logo_url VARCHAR(255) COMMENT 'URL del logotipo oficial',
   micrositio_url VARCHAR(255) COMMENT 'Enlace externo a un sitio dedicado (opcional)',
@@ -428,7 +428,7 @@ CREATE TABLE IF NOT EXISTS marcas (
 CREATE TABLE IF NOT EXISTS categorias (
   categoria_id INT AUTO_INCREMENT PRIMARY KEY,
   nombre_categoria VARCHAR(100) NOT NULL UNIQUE,
-  slug_categoria VARCHAR(100) NOT NULL UNIQUE COMMENT 'Identificador único amigable para URLs',
+  slug_categoria VARCHAR(100) UNIQUE COMMENT 'Identificador único amigable para URLs',
   descripcion TEXT COMMENT 'Resumen o propósito de la categoría',
   icono_url VARCHAR(255) COMMENT 'Icono visual de la categoría (opcional)',
 
@@ -455,7 +455,7 @@ CREATE TABLE IF NOT EXISTS subcategorias (
   categoria_id INT NOT NULL,
 
   nombre_subcategoria VARCHAR(100) NOT NULL,
-  slug_subcategoria VARCHAR(100) NOT NULL COMMENT 'Slug único por subcategoría',
+  slug_subcategoria VARCHAR(100) COMMENT 'Slug único por subcategoría',
   descripcion TEXT,
   icono_url VARCHAR(255),
 
@@ -570,7 +570,7 @@ CREATE TABLE IF NOT EXISTS productos (
   producto_id INT AUTO_INCREMENT PRIMARY KEY,
 
   nombre VARCHAR(150) NOT NULL,
-  slug_producto VARCHAR(150) NOT NULL UNIQUE,
+  slug_producto VARCHAR(150) UNIQUE,
   descripcion TEXT NOT NULL,
   especificaciones TEXT,
   sku VARCHAR(50) UNIQUE,
@@ -2034,8 +2034,7 @@ DO
 
 
 
-
-
+  -- 🏆 SP: Crear pedido completo
 
 
 -- 🧾 SP: Canjear puntos por cupon

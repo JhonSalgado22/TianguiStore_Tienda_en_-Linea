@@ -1,37 +1,45 @@
-<!-- 📁 404.html - Página de error 404 (Página no encontrada) -->
-
+<!-- 📁 404.html - Página de error 404 TianguiStore -->
 <!DOCTYPE html>
 <html lang="es-MX">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>404 - Página no encontrada</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 - Página no encontrada | TianguiStore</title>
 
   <!-- MaterializeCSS -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" crossorigin="anonymous" />
   <!-- FontAwesome -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-  <!-- Enlace al archivo CSS externo -->
-  <link href="path/to/main.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" crossorigin="anonymous" />
+  <!-- Estilos personalizados -->
+  <link rel="stylesheet" href="estilo/main.css" />
 </head>
-<body>
 
-  <main class="container" role="main" aria-labelledby="error-title">
-    <!-- Título de la página de error -->
-    <h1><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> 404</h1>
-    <h2 id="error-title">Página no encontrada</h2>
+<body class="grey darken-4 white-text d-flex flex-column min-vh-100">
 
-    <!-- Mensaje descriptivo de error -->
-    <p>Lo sentimos, la página que buscas no existe o fue movida. Intenta buscar en otras secciones del sitio.</p>
+  <main class="container center-align animate__animated animate__fadeIn" role="main" aria-labelledby="error-title" style="padding-top: 10vh;">
+    <i class="fas fa-exclamation-triangle fa-5x amber-text text-accent-3 mb-3" aria-hidden="true"></i>
+    <h1 class="amber-text text-accent-3" id="error-title">404</h1>
+    <h2 class="white-text">Página no encontrada</h2>
+    <p class="grey-text text-lighten-2 flow-text">
+      Lo sentimos, la página que buscas no existe o fue movida.<br>
+      Intenta navegar desde el inicio o usar el menú principal.
+    </p>
 
-    <!-- Botón para volver al inicio -->
-    <a href="index.html" class="btn btn-primary waves-effect waves-light" role="button" aria-label="Volver al inicio">
-      <i class="fas fa-arrow-left"></i> Volver al inicio
+    <a href="index.html" class="btn-large teal lighten-1 waves-effect waves-light mt-3" aria-label="Volver al inicio">
+      <i class="fas fa-home left"></i> Ir al inicio
     </a>
   </main>
 
-  <!-- Materialize JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <!-- Footer opcional -->
+  <footer class="page-footer grey darken-3 mt-auto">
+    <div class="container center-align">
+      <small class="grey-text text-lighten-1">TianguiStore © 2025</small>
+    </div>
+  </footer>
 
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js" defer></script>
 </body>
 </html>

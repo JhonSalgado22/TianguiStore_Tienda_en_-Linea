@@ -1,52 +1,85 @@
 /**
  * 📦 loadComponent.js
- * Carga dinámica de Navbar/Footer, aplica el tema y ajusta menús según la sesión.
- * Compatible con MaterializeCSS y diseño responsive.
- * 
- * Autor: I.S.C. Erick Renato Vega Ceron
- * Última actualización: Mayo 2025
+ * Carga dinámica de Navbar y Footer, aplica tema, y controla visibilidad por sesión.
+ * Autor: I.S.C. Erick Renato Vega Ceron — Mayo 2025
  */
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     aplicarTemaDesdePreferencias();
-    await inicializarNavbarYFooter();
-    inicializarComponentesMaterialize();
+    await Promise.all([cargarNavbar(), cargarFooter()]);
     sincronizarToggleTema();
     actualizarContadorCarrito();
-    controlarVisibilidadMenus();
   } catch (error) {
-    console.error("⚠️ Error al inicializar la interfaz:", error);
+    console.error("⚠️ Error al inicializar interfaz:", error);
   }
 });
 
-// 🔄 Cargar dinámicamente el navbar y footer
-async function inicializarNavbarYFooter() {
-  const navbarContainer = document.getElementById("navbar-container");
-  const footerContainer = document.getElementById("footer-container");
+/* ══════════════════════════════════════════════
+   📁 CARGA DE COMPONENTES
+══════════════════════════════════════════════ */
 
-  if (navbarContainer) {
+async function cargarNavbar() {
+  const contenedor = document.getElementById("navbar-container");
+  if (!contenedor) return;
+
+  try {
     const res = await fetch("./componentes/navbar.html");
-    if (!res.ok) throw new Error("No se pudo cargar navbar.html");
-    navbarContainer.innerHTML = await res.text();
-  }
+    if (!res.ok) throw new Error("Error al cargar navbar");
+    contenedor.innerHTML = await res.text();
+    contenedor.classList.add("animate__animated", "animate__fadeInDown");
 
-  if (footerContainer) {
+    inicializarMaterialize();
+    gestionarVisibilidadMenus();
+  } catch {
+    contenedor.innerHTML = `<nav class="red darken-4 center-align">⚠️ Error al cargar menú</nav>`;
+  }
+}
+
+async function cargarFooter() {
+  const contenedor = document.getElementById("footer-container");
+  if (!contenedor) return;
+
+  try {
     const res = await fetch("./componentes/footer.html");
-    if (!res.ok) throw new Error("No se pudo cargar footer.html");
-    footerContainer.innerHTML = await res.text();
+    if (!res.ok) throw new Error("Error al cargar footer");
+    contenedor.innerHTML = await res.text();
+    contenedor.classList.add("animate__animated", "animate__fadeInUp");
+  } catch {
+    contenedor.innerHTML = `<footer class="page-footer red darken-4 center-align">⚠️ Error al cargar pie de página</footer>`;
   }
 }
 
-// 🌓 Aplicar tema claro u oscuro según preferencias guardadas
+/* ══════════════════════════════════════════════
+   🌗 TEMA OSCURO / CLARO
+══════════════════════════════════════════════ */
+
 function aplicarTemaDesdePreferencias() {
-  const temaGuardado = localStorage.getItem("tema");
-  const esOscuro = !temaGuardado || temaGuardado === "oscuro";
-  document.documentElement.classList.toggle("dark", esOscuro);
+  const tema = localStorage.getItem("tema") ?? "oscuro";
+  document.documentElement.classList.toggle("dark", tema === "oscuro");
 }
 
-// ⚙️ Inicializar componentes de Materialize
-function inicializarComponentesMaterialize() {
+function sincronizarToggleTema() {
+  const toggle = document.getElementById("toggleThemeBtn");
+  const icono = toggle?.querySelector("i");
+  if (!toggle || !icono) return;
+
+  const temaActual = localStorage.getItem("tema") ?? "oscuro";
+  icono.classList.replace("fa-moon", temaActual === "oscuro" ? "fa-sun" : "fa-moon");
+
+  toggle.addEventListener("click", () => {
+    const esOscuro = document.documentElement.classList.toggle("dark");
+    localStorage.setItem("tema", esOscuro ? "oscuro" : "claro");
+    icono.classList.toggle("fa-sun", esOscuro);
+    icono.classList.toggle("fa-moon", !esOscuro);
+  });
+}
+
+/* ══════════════════════════════════════════════
+   🧠 MATERIALIZE INIT
+══════════════════════════════════════════════ */
+
+function inicializarMaterialize() {
   M.Sidenav.init(document.querySelectorAll(".sidenav"));
   M.Tooltip.init(document.querySelectorAll(".tooltipped"));
   M.Dropdown.init(document.querySelectorAll(".dropdown-trigger"), {
@@ -56,134 +89,95 @@ function inicializarComponentesMaterialize() {
   });
 }
 
-// 🌗 Sincronizar el botón de tema con el estado actual
-function sincronizarToggleTema() {
-  const toggleBtn = document.getElementById("toggleThemeBtn");
-  const icon = toggleBtn?.querySelector("i");
-  if (!toggleBtn || !icon) return;
+/* ══════════════════════════════════════════════
+   🛒 CARRITO
+══════════════════════════════════════════════ */
 
-  const temaActual = localStorage.getItem("tema") || "oscuro";
-  icon.classList.replace("fa-moon", temaActual === "oscuro" ? "fa-sun" : "fa-moon");
-
-  toggleBtn.addEventListener("click", () => {
-    const esOscuro = document.documentElement.classList.toggle("dark");
-    localStorage.setItem("tema", esOscuro ? "oscuro" : "claro");
-    icon.classList.toggle("fa-sun", esOscuro);
-    icon.classList.toggle("fa-moon", !esOscuro);
-  });
-}
-
-// 🛒 Actualiza el contador total del carrito
 function actualizarContadorCarrito() {
   try {
-    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-    const total = carrito.reduce((suma, item) => suma + item.cantidad, 0);
-    document.querySelectorAll("#contador-carrito").forEach(el => {
-      el.textContent = total;
-    });
-  } catch (error) {
-    console.error("❌ Error al actualizar carrito:", error);
+    const carrito = JSON.parse(localStorage.getItem("carrito") ?? "[]");
+    const total = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+    document.querySelectorAll("#contador-carrito")
+      .forEach(el => el.textContent = total);
+  } catch (e) {
+    console.error("❌ Error al actualizar carrito:", e);
   }
 }
 
-// 🔐 Control dinámico de visibilidad de menús por sesión y permisos
-function controlarVisibilidadMenus() {
+/* ══════════════════════════════════════════════
+   🔐 VISIBILIDAD DE MENÚ POR SESIÓN
+══════════════════════════════════════════════ */
+
+function gestionarVisibilidadMenus() {
   const token = localStorage.getItem("token");
-  const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
-  const permisos = usuario?.permisos || {};
-  const pedidos = usuario?.pedidos || [];
+  const usuario = JSON.parse(localStorage.getItem("usuario") ?? "null");
+  const permisos = usuario?.permisos ?? {};
   const usuarioInfo = document.getElementById("usuario-info");
 
-  const mostrar = (ids, visible = true) => {
+  const mostrar = (ids, visible = true) =>
     [].concat(ids).forEach(id => {
       const el = document.getElementById(id);
       if (el) el.style.display = visible ? "block" : "none";
     });
-  };
+
+  const idsGlobales = [
+    "menu-login", "menu-login-desktop", "menu-login-mobile",
+    "menu-registro", "menu-registro-mobile",
+    "menu-logout", "menu-logout-desktop", "menu-logout-mobile",
+    "menu-perfil-desktop", "menu-perfil-mobile",
+    "nav-usuarios", "nav-usuarios-mobile",
+    "nav-pedidos", "nav-pedidos-mobile",
+    "nav-configuracion", "nav-metricas", "nav-panel"
+  ];
+
+  mostrar(idsGlobales, false);
 
   if (!token || !usuario) {
+    mostrar(["menu-login", "menu-login-desktop", "menu-login-mobile", "menu-registro", "menu-registro-mobile"], true);
     if (usuarioInfo) usuarioInfo.textContent = "Cuenta";
-    mostrar([
-      "menu-login", "menu-registro",
-      "menu-login-desktop", "menu-registro-desktop",
-      "menu-login-mobile", "menu-registro-mobile"
-    ], true);
-
-    mostrar([
-      "menu-logout", "menu-logout-desktop", "menu-logout-mobile",
-      "menu-perfil-desktop", "menu-perfil-mobile",
-      "nav-pedidos", "nav-pedidos-mobile"
-    ], false);
-
-    ocultarMenusPrivados();
     return;
   }
 
-  // Usuario autenticado
-  if (usuarioInfo) {
-    usuarioInfo.textContent = usuario.nombre || usuario.correo || "Usuario";
-  }
+  if (usuarioInfo) usuarioInfo.textContent = usuario.nombre ?? usuario.correo ?? "Usuario";
 
-  mostrar([
-    "menu-login", "menu-registro",
-    "menu-login-desktop", "menu-registro-desktop",
-    "menu-login-mobile", "menu-registro-mobile"
-  ], false);
+  mostrar(["menu-logout", "menu-logout-desktop", "menu-logout-mobile"], true);
+  mostrar(["menu-perfil-desktop", "menu-perfil-mobile"], true);
+  mostrar(["nav-pedidos", "nav-pedidos-mobile"], true); // Siempre visible autenticado
 
-  mostrar([
-    "menu-logout", "menu-logout-desktop", "menu-logout-mobile",
-    "menu-perfil-desktop", "menu-perfil-mobile"
-  ], true);
-
-  asignarLogout(["menu-logout", "menu-logout-desktop", "menu-logout-mobile"]);
-
-  // Mostrar "Mis pedidos" si tiene alguno
-  const tienePedidos = Array.isArray(pedidos) && pedidos.length > 0;
-  mostrar(["nav-pedidos", "nav-pedidos-mobile"], tienePedidos);
-
-  // Mostrar menús administrativos por permisos
   const reglas = [
-    { keys: ["nav-usuarios", "nav-usuarios-mobile"], visible: permisos.usuarios?.leer },
-    { keys: ["nav-configuracion"], visible: permisos.configuracion?.leer },
-    { keys: ["nav-metricas"], visible: permisos.reportes?.exportar },
+    { ids: ["nav-usuarios", "nav-usuarios-mobile"], permiso: permisos.usuarios?.leer },
+    { ids: ["nav-configuracion"], permiso: permisos.configuracion?.leer },
+    { ids: ["nav-metricas"], permiso: permisos.reportes?.exportar },
     {
-      keys: ["nav-panel"],
-      visible:
+      ids: ["nav-panel"],
+      permiso:
         permisos.usuarios?.leer ||
         permisos.productos?.leer ||
         permisos.configuracion?.leer ||
         permisos.reportes?.exportar
     }
   ];
+  reglas.forEach(({ ids, permiso }) => mostrar(ids, permiso));
 
-  reglas.forEach(({ keys, visible }) => mostrar(keys, visible));
+  asignarLogout(["menu-logout", "menu-logout-desktop", "menu-logout-mobile"]);
 }
 
-// 🚪 Asignar logout a múltiples botones
+/* ══════════════════════════════════════════════
+   🔓 LOGOUT
+══════════════════════════════════════════════ */
+
 function asignarLogout(ids) {
   const logout = () => {
     localStorage.clear();
-    M.toast({ html: "Sesión cerrada exitosamente", classes: "rounded amber darken-3" });
+    M.toast({
+      html: "Sesión cerrada exitosamente",
+      classes: "rounded amber darken-3",
+    });
     window.location.href = "login.html";
   };
 
   ids.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.onclick = logout;
-  });
-}
-
-// 🔒 Ocultar elementos restringidos por defecto
-function ocultarMenusPrivados() {
-  const privados = [
-    "nav-usuarios", "nav-usuarios-mobile",
-    "nav-pedidos", "nav-pedidos-mobile",
-    "nav-configuracion", "nav-metricas", "nav-panel",
-    "menu-perfil-desktop", "menu-perfil-mobile"
-  ];
-
-  privados.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = "none";
   });
 }

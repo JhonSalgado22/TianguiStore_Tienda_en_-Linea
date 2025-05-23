@@ -1,5 +1,3 @@
-<!-- 📁 registro.html - Registro profesional con diseño moderno y responsivo -->
-
 <!DOCTYPE html>
 <html lang="es-MX">
 <head>
@@ -13,65 +11,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <!-- Estilos personalizados -->
   <link rel="stylesheet" href="estilo/main.css" />
-  <style>
-    body {
-      background: linear-gradient(to right top, #1c1c1c, #2e2e2e);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    main {
-      flex: 1 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 4vh 2vw;
-    }
-
-    .card {
-      border-radius: 12px;
-      padding: 2rem;
-    }
-
-    .input-field input,
-    .input-field textarea,
-    .input-field select {
-      background-color: transparent !important;
-      border-bottom: 1px solid #888;
-    }
-
-    .input-field label {
-      color: #ccc;
-    }
-
-    .btn-large {
-      border-radius: 8px;
-    }
-
-    #togglePassword {
-      position: absolute;
-      right: 12px;
-      top: 14px;
-      cursor: pointer;
-      color: #bbb;
-    }
-
-    .form-title {
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-    }
-  </style>
 </head>
-
 <body class="grey darken-4 white-text">
-
-  <!-- Navbar dinámico -->
   <div id="navbar-container"></div>
 
-  <!-- Contenido principal -->
   <main>
-    <div class="card grey darken-3 z-depth-5" style="max-width: 860px; width: 100%;">
+    <div class="card grey darken-3 z-depth-5 registro-card">
       <div class="card-content white-text">
         <h4 class="form-title center-align">
           <i class="fas fa-user-plus"></i> Crear una Cuenta
@@ -80,93 +25,94 @@
         <form id="registroForm" novalidate autocomplete="on">
           <div class="row">
             <div class="input-field col s12 m6">
-              <i class="fas fa-user prefix"></i>
-              <input id="nombre" name="nombre" type="text" required autocomplete="given-name" />
-              <label for="nombre">Nombre *</label>
+              <i class="fas fa-envelope prefix"></i>
+              <input type="email" id="email" name="email" required autocomplete="email" />
+              <label for="email">Correo electrónico *</label>
             </div>
 
-            <div class="input-field col s12 m6">
-              <i class="fas fa-id-card prefix"></i>
-              <input id="apellido_paterno" name="apellido_paterno" type="text" autocomplete="additional-name" />
-              <label for="apellido_paterno">Apellido Paterno</label>
+            <div class="input-field col s12 m6 password-field">
+              <i class="fas fa-lock prefix"></i>
+              <input type="password" id="password" name="password" pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$" required autocomplete="new-password" />
+              <label for="password">Contraseña *</label>
+              <span id="fuerzaPassword" class="helper-text grey-text">Mínimo 8 caracteres, al menos una letra y un número.</span>
+              <a id="togglePassword" title="Mostrar/Ocultar contraseña"><i class="fas fa-eye-slash"></i></a>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="input-field col s12 m6 offset-m6 password-field">
+              <i class="fas fa-lock prefix"></i>
+              <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="new-password" />
+              <label for="confirmPassword">Confirmar contraseña *</label>
+              <span id="mensajeConfirmacion" class="helper-text grey-text">Repite la contraseña.</span>
+              <a id="toggleConfirm" title="Mostrar/Ocultar confirmación"><i class="fas fa-eye-slash"></i></a>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="input-field col s12 m4">
+              <input type="text" id="nombre" name="nombre" required />
+              <label for="nombre">Nombre *</label>
+            </div>
+            <div class="input-field col s12 m4">
+              <input type="text" id="apellido_paterno" name="apellido_paterno" />
+              <label for="apellido_paterno">Apellido paterno</label>
+            </div>
+            <div class="input-field col s12 m4">
+              <input type="text" id="apellido_materno" name="apellido_materno" />
+              <label for="apellido_materno">Apellido materno</label>
             </div>
           </div>
 
           <div class="row">
             <div class="input-field col s12 m6">
-              <i class="fas fa-id-card prefix"></i>
-              <input id="apellido_materno" name="apellido_materno" type="text" autocomplete="additional-name" />
-              <label for="apellido_materno">Apellido Materno</label>
-            </div>
-
-            <div class="input-field col s12 m6">
-              <i class="fas fa-venus-mars prefix"></i>
-              <select id="genero" name="genero" required class="browser-default grey darken-4 white-text">
-                <option value="" disabled selected>Selecciona tu género</option>
+              <select id="genero" name="genero">
+                <option value="no_especificado" selected>No especificado</option>
                 <option value="masculino">Masculino</option>
                 <option value="femenino">Femenino</option>
                 <option value="otro">Otro</option>
-                <option value="no_especificado">Prefiero no decirlo</option>
               </select>
-              <label class="active" for="genero">Género *</label>
+              <label for="genero">Género</label>
+            </div>
+            <div class="input-field col s12 m6">
+              <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" />
+              <label for="fecha_nacimiento">Fecha de nacimiento</label>
             </div>
           </div>
 
           <div class="row">
             <div class="input-field col s12 m6">
-              <i class="fas fa-calendar-day prefix"></i>
-              <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" autocomplete="bday" />
-              <label for="fecha_nacimiento" class="active">Fecha de Nacimiento</label>
-            </div>
-
-            <div class="input-field col s12 m6">
-              <i class="fas fa-phone prefix"></i>
-              <input type="tel" id="telefono" name="telefono" autocomplete="tel" />
+              <input type="tel" id="telefono" name="telefono" />
               <label for="telefono">Teléfono</label>
             </div>
-          </div>
-
-          <div class="row">
-            <div class="input-field col s12">
-              <i class="fas fa-map-marker-alt prefix"></i>
-              <textarea id="direccion" name="direccion" class="materialize-textarea" autocomplete="street-address"></textarea>
+            <div class="input-field col s12 m6">
+              <input type="text" id="direccion" name="direccion" />
               <label for="direccion">Dirección</label>
             </div>
           </div>
 
           <div class="row">
-            <div class="input-field col s12 m6">
-              <i class="fas fa-envelope prefix"></i>
-              <input type="email" id="email" name="email" required autocomplete="email" />
-              <label for="email">Correo electrónico *</label>
-              <span class="helper-text" data-error="Correo inválido"></span>
-            </div>
-
-            <div class="input-field col s12 m6" style="position: relative;">
-              <i class="fas fa-lock prefix"></i>
-              <input type="password" id="password" name="password"
-                     pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
-                     required autocomplete="new-password" />
-              <label for="password">Contraseña *</label>
-              <span class="helper-text" data-error="Incluye al menos 8 caracteres, una letra y un número."></span>
-              <a id="togglePassword" title="Mostrar/Ocultar contraseña">
-                <i class="fas fa-eye-slash"></i>
-              </a>
+            <div class="input-field col s12">
+              <select id="origen_reclutamiento" name="origen_reclutamiento">
+                <option value="externo" selected>Externo</option>
+                <option value="interno">Interno</option>
+                <option value="campaña">Campaña</option>
+                <option value="referido">Referido</option>
+                <option value="fidelidad">Fidelidad</option>
+              </select>
+              <label for="origen_reclutamiento">Origen del reclutamiento</label>
             </div>
           </div>
 
-          <!-- Mensajes del sistema -->
           <div id="mensajeError" class="card-panel red darken-2 white-text" style="display: none;"></div>
           <div id="mensajeExito" class="card-panel green darken-2 white-text" style="display: none;"></div>
 
-          <!-- Botón -->
           <div class="row center-align" style="margin-top: 2rem;">
             <button type="submit" class="btn-large amber darken-3 waves-effect waves-light">
               <i class="fas fa-user-plus left"></i> Registrarse
             </button>
           </div>
 
-          <!-- Ya tiene cuenta -->
           <div class="section center-align">
             <a href="login.html" class="grey-text text-lighten-3">
               <i class="fas fa-arrow-left left"></i> Ya tengo una cuenta
@@ -177,10 +123,8 @@
     </div>
   </main>
 
-  <!-- Footer dinámico -->
   <div id="footer-container"></div>
 
-  <!-- Scripts -->
   <script src="scripts/loadComponent.js" defer></script>
   <script src="scripts/registro.js" defer></script>
   <script src="scripts/togglePassword.js" defer></script>

@@ -1,86 +1,77 @@
-<!-- 📁 misPedidos.html - Página de Mis Pedidos en TianguiStore -->
+<!-- 📁 misPedidos.html - TianguiStore -->
 <!DOCTYPE html>
 <html lang="es-MX">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mis Pedidos | TianguiStore</title>
 
-  <!-- MaterializeCSS -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet" />
-  
-  <!-- FontAwesome -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
-  
-  <!-- Estilos personalizados -->
-  <link rel="stylesheet" href="estilo/estilos.css" />
+  <!-- Frameworks -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" crossorigin="anonymous" />
+
+  <!-- Estilo personalizado -->
+  <link rel="stylesheet" href="estilo/main.css" />
 </head>
 
-<body class="grey darken-4 white-text d-flex flex-column min-vh-100">
+<body class="grey darken-4 white-text d-flex flex-column min-vh-100 animate__animated animate__fadeIn">
 
-  <!-- Navbar dinámico -->
-  <div id="navbar-container"></div>
+  <!-- 🔝 Navbar -->
+  <header id="navbar-container" role="banner"></header>
 
-  <!-- Contenido principal -->
-  <main class="container my-5">
-    <section class="center-align mb-4">
+  <!-- 📦 Contenido principal -->
+  <main class="container my-4" role="main">
+    <section class="section center-align">
       <h4 class="amber-text text-accent-3">
-        <i class="fas fa-box me-2"></i> Mis Pedidos
+        <i class="fas fa-box-open" aria-hidden="true"></i> Mis Pedidos
       </h4>
       <p class="grey-text text-lighten-1">Consulta los pedidos que has realizado y su estado actual.</p>
     </section>
 
-    <!-- Tabla de pedidos -->
-    <div class="card-panel grey darken-3 z-depth-2">
-      <table class="striped centered highlight responsive-table white-text">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Fecha</th>
-            <th>Estado</th>
-            <th>Total</th>
-            <th>Productos</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="tabla-pedidos">
-          <!-- Cargado dinámicamente desde misPedidos.js -->
-        </tbody>
-      </table>
+    <!-- 🧾 Tabla responsive -->
+    <div class="card-panel grey darken-3 z-depth-2 animate__animated animate__fadeInUp">
+      <div class="responsive-table">
+        <table class="striped highlight centered white-text" aria-label="Listado de pedidos">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+              <th>Total</th>
+              <th>Productos</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-pedidos">
+            <!-- Cargado dinámicamente por misPedidos.js -->
+          </tbody>
+        </table>
+      </div>
     </div>
   </main>
 
-  <!-- Modal: Detalle de productos -->
-  <div id="modalDetalleProductos" class="modal modal-fixed-footer">
+  <!-- 🔍 Modal de detalle -->
+  <div id="modalDetalleProductos" class="modal modal-fixed-footer" role="dialog" aria-modal="true" aria-labelledby="titulo-modal-productos">
     <div class="modal-content grey darken-4 white-text">
-      <h5 class="amber-text text-accent-3"><i class="fas fa-boxes"></i> Productos del Pedido</h5>
+      <h5 id="titulo-modal-productos" class="amber-text text-accent-3">
+        <i class="fas fa-boxes" aria-hidden="true"></i> Productos del Pedido
+      </h5>
       <div id="detalle-productos-contenido" class="row">
         <!-- Contenido generado dinámicamente -->
       </div>
     </div>
     <div class="modal-footer grey darken-3">
-      <a href="#!" class="modal-close waves-effect btn-flat white-text">Cerrar</a>
+      <button class="modal-close waves-effect btn-flat white-text" aria-label="Cerrar modal">Cerrar</button>
     </div>
   </div>
 
-  <!-- Toast Container -->
-  <div id="toast-container" class="fixed-action-btn" style="bottom: 1rem; right: 1rem;"></div>
+  <!-- 🔚 Footer -->
+  <footer id="footer-container" class="mt-auto" role="contentinfo"></footer>
 
-  <!-- Footer dinámico -->
-  <div id="footer-container" class="mt-auto"></div>
-
-  <!-- Scripts -->
-  <script src="scripts/loadComponent.js"></script>
+  <!-- 🧠 Scripts -->
+  <script src="scripts/loadComponent.js" defer></script>
   <script src="scripts/misPedidos.js" defer></script>
-
-  <!-- Materialize JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const modales = document.querySelectorAll(".modal");
-      M.Modal.init(modales);
-    });
-  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js" crossorigin="anonymous" defer></script>
 </body>
 </html>
