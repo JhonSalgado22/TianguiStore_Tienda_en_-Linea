@@ -44,8 +44,12 @@ function mostrarCarrito() {
   if (!lista || !totalLabel || !subtotalLabel || !ivaLabel) return;
 
   lista.innerHTML = "";
+
   if (carrito.length === 0) {
-    lista.innerHTML = `<li class='collection-item center-align grey-text text-lighten-1'>🛒 Tu carrito está vacío.</li>`;
+    lista.innerHTML = `
+      <li class="collection-item center-align grey-text text-lighten-1">
+        🛒 Tu carrito está vacío.
+      </li>`;
     subtotalLabel.textContent = "$0.00";
     ivaLabel.textContent = "$0.00";
     totalLabel.textContent = "Total: $0.00";
@@ -55,40 +59,46 @@ function mostrarCarrito() {
   let subtotal = 0;
   const IVA_PORCENTAJE = 0.16;
 
-  carrito.forEach(producto => {
+  carrito.forEach((producto) => {
     const precio = parseFloat(producto.precio) || 0;
     const cantidad = producto.cantidad || 1;
     const itemSubtotal = precio * cantidad;
     subtotal += itemSubtotal;
 
-    const imagenUrl = producto.imagen_url?.startsWith("http")
-      ? producto.imagen_url
-      : `${BASE_URL}/${producto.imagen_url?.replace(/^\/+/, "") || "imagenes/default.png"}`;
+    const imagenUrl =
+      producto.imagen_url && producto.imagen_url.trim()
+        ? producto.imagen_url.startsWith("http")
+          ? producto.imagen_url
+          : `${BASE_URL}/${producto.imagen_url.replace(/^\/+/, "")}`
+        : `${BASE_URL}/imagenes/default.png`;
 
     const item = document.createElement("li");
     item.className = "collection-item grey darken-4 white-text";
 
-    const contenido = `
-      <div class="row valign-wrapper">
+    item.innerHTML = `
+      <div class="row valign-wrapper producto-item">
         <div class="col s3 center-align">
-          <img src="${imagenUrl}" alt="${producto.nombre}" class="responsive-img circle z-depth-2" 
-            style="width: 72px; height: 72px; object-fit: cover;" 
-            onerror="this.src='${BASE_URL}/imagenes/default.png';" />
+         <img src="${imagenUrl}" alt="${producto.nombre}"
+        class="responsive-img z-depth-2 producto-img"
+        style="width: 100px; height: 100px; object-fit: cover; border-radius: 0.5rem;"
+        data-id="${producto.id}" />
         </div>
         <div class="col s9">
           <h6 class="truncate white-text">${producto.nombre}</h6>
           <p class="grey-text text-lighten-1">
-            Precio: <strong class="teal-text">$${precio.toFixed(2)}</strong> | 
+            Precio: <strong class="teal-text">$${precio.toFixed(2)}</strong> |
             Subtotal: <strong class="green-text">$${itemSubtotal.toFixed(2)}</strong>
           </p>
-          <div class="center-align">
-            <button class="btn-floating btn-small red darken-2 disminuir-cantidad" data-id="${producto.id}">
-              <i class="fas fa-minus"></i>
-            </button>
-            <span class="mx-2 white-text">${cantidad}</span>
-            <button class="btn-floating btn-small green darken-2 aumentar-cantidad" data-id="${producto.id}">
-              <i class="fas fa-plus"></i>
-            </button>
+          <div class="center-align" style="margin-top: 0.5rem;">
+            <div style="margin-bottom: 0.6rem;">
+              <button class="btn-floating btn-small red darken-2 disminuir-cantidad" data-id="${producto.id}">
+                <i class="fas fa-minus"></i>
+              </button>
+              <span class="mx-2 white-text" style="margin: 0 0.8rem;">${cantidad}</span>
+              <button class="btn-floating btn-small green darken-2 aumentar-cantidad" data-id="${producto.id}">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
             <button class="btn-flat btn-small white-text red-text eliminar-producto" data-id="${producto.id}">
               <i class="fas fa-trash-alt left"></i> Eliminar
             </button>
@@ -97,8 +107,16 @@ function mostrarCarrito() {
       </div>
     `;
 
-    item.innerHTML = contenido;
     lista.appendChild(item);
+    const img = item.querySelector("img.producto-img");
+    if (img) {
+      img.addEventListener("error", () => {
+        if (!img.dataset.defaulted) {
+          img.dataset.defaulted = "true";
+          img.src = `${BASE_URL}/imagenes/default.png`;
+        }
+      });
+    }
   });
 
   const iva = subtotal * IVA_PORCENTAJE;
@@ -109,15 +127,21 @@ function mostrarCarrito() {
   totalLabel.textContent = `Total: $${total.toFixed(2)}`;
 
   // Reasignar listeners
-  document.querySelectorAll(".disminuir-cantidad").forEach(btn =>
-    btn.addEventListener("click", () => modificarCantidad(btn.dataset.id, -1))
-  );
-  document.querySelectorAll(".aumentar-cantidad").forEach(btn =>
-    btn.addEventListener("click", () => modificarCantidad(btn.dataset.id, 1))
-  );
-  document.querySelectorAll(".eliminar-producto").forEach(btn =>
-    btn.addEventListener("click", () => eliminarProducto(btn.dataset.id))
-  );
+  document
+    .querySelectorAll(".disminuir-cantidad")
+    .forEach((btn) =>
+      btn.addEventListener("click", () => modificarCantidad(btn.dataset.id, -1))
+    );
+  document
+    .querySelectorAll(".aumentar-cantidad")
+    .forEach((btn) =>
+      btn.addEventListener("click", () => modificarCantidad(btn.dataset.id, 1))
+    );
+  document
+    .querySelectorAll(".eliminar-producto")
+    .forEach((btn) =>
+      btn.addEventListener("click", () => eliminarProducto(btn.dataset.id))
+    );
 }
 
 /* ══════════════════════════════════════════════
@@ -125,7 +149,7 @@ function mostrarCarrito() {
 ══════════════════════════════════════════════ */
 function modificarCantidad(id, cambio) {
   let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-  const index = carrito.findIndex(p => p.id === id);
+  const index = carrito.findIndex((p) => p.id === id);
   if (index !== -1) {
     carrito[index].cantidad += cambio;
     if (carrito[index].cantidad <= 0) carrito.splice(index, 1);
@@ -140,7 +164,7 @@ function modificarCantidad(id, cambio) {
 ══════════════════════════════════════════════ */
 function eliminarProducto(id) {
   let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-  carrito = carrito.filter(p => p.id !== id);
+  carrito = carrito.filter((p) => p.id !== id);
   localStorage.setItem("carrito", JSON.stringify(carrito));
   mostrarCarrito();
   actualizarContadorCarrito();
@@ -153,14 +177,17 @@ function eliminarProducto(id) {
 function actualizarContadorCarrito() {
   const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
   const total = carrito.reduce((sum, p) => sum + p.cantidad, 0);
-  document.querySelectorAll("#contador-carrito").forEach(el => el.textContent = total);
+  document
+    .querySelectorAll("#contador-carrito")
+    .forEach((el) => (el.textContent = total));
 }
 
 /* ══════════════════════════════════════════════
    🔔 Toast UI
 ══════════════════════════════════════════════ */
 function mostrarToast(mensaje, tipo = "success") {
-  const container = document.getElementById("toast-container") || crearContenedorToasts();
+  const container =
+    document.getElementById("toast-container") || crearContenedorToasts();
   const toast = document.createElement("div");
   toast.className = `toast align-items-center text-white bg-${tipo} border-0 show shadow mb-2`;
   toast.setAttribute("role", "alert");
@@ -198,10 +225,13 @@ async function validarStockAntesDeCheckout() {
   for (const item of carrito) {
     try {
       const res = await fetch(`${BASE_URL}/productos/${item.id}`);
-      if (!res.ok) throw new Error("No se pudo obtener información del producto.");
+      if (!res.ok)
+        throw new Error("No se pudo obtener información del producto.");
       const producto = await res.json();
       if (item.cantidad > producto.stock) {
-        errores.push(`"${producto.nombre}" solo tiene ${producto.stock} unidades disponibles.`);
+        errores.push(
+          `"${producto.nombre}" solo tiene ${producto.stock} unidades disponibles.`
+        );
       }
     } catch (error) {
       errores.push(`Error al verificar stock del producto ID ${item.id}`);

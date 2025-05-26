@@ -1,44 +1,48 @@
 <!-- 📁 navbar.html - Navegación principal TianguiStore -->
-
 <nav class="nav-extended glass-navbar z-depth-2">
-  <div class="nav-wrapper container" style="display: flex; justify-content: space-between; align-items: center;">
+  <div class="nav-wrapper container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
 
-    <!-- 🔷 Logo vertical -->
-    <a href="index.html" class="brand-logo" style="display: flex; flex-direction: column; align-items: center; margin-right: 1rem;">
+    <!-- 🔷 Logo y nombre a la izquierda -->
+    <a href="index.html" class="brand-logo" style="display: flex; align-items: center; gap: 0.5rem;">
       <img src="./imagenes/logo.jpeg" alt="Logo TianguiStore" class="circle" style="width: 36px; height: 36px;" />
-      <span class="white-text" style="font-weight: 600; font-size: 0.95rem;">TianguiStore</span>
+      <span class="white-text" style="font-weight: 600; font-size: 1rem;">TianguiStore</span>
     </a>
 
     <!-- 🍔 Hamburguesa móvil -->
-    <a href="#" data-target="sidenav-mobile" class="sidenav-trigger right"><i class="fas fa-bars"></i></a>
+    <a href="#" data-target="sidenav-mobile" class="sidenav-trigger right"><i class="fas fa-bars white-text"></i></a>
 
-    <!-- 📁 Menú principal -->
-    <ul class="right hide-on-med-and-down" style="display: flex; align-items: end; gap: 2rem;">
-      <li><a href="index.html" class="center-align"><i class="fas fa-home fa-lg"></i><br>Inicio</a></li>
-      <li><a href="productos.html" class="center-align"><i class="fas fa-box-open fa-lg"></i><br>Productos</a></li>
-      <li><a href="categorias.html" class="center-align"><i class="fas fa-tags fa-lg"></i><br>Categorías</a></li>
-      <li><a href="carrito.html" class="center-align"><i class="fas fa-shopping-cart fa-lg"></i><br>Carrito (<span id="contador-carrito">0</span>)</a></li>
-      <li id="nav-pedidos" style="display: none;"><a href="misPedidos.html" class="center-align"><i class="fas fa-receipt fa-lg"></i><br>Mis pedidos</a></li>
-      <li id="nav-usuarios" style="display: none;"><a href="#" class="center-align"><i class="fas fa-users-cog fa-lg"></i><br>Usuarios</a></li>
-      <li id="nav-configuracion" style="display: none;"><a href="#" class="center-align"><i class="fas fa-cog fa-lg"></i><br>Configuración</a></li>
-      <li id="nav-metricas" style="display: none;"><a href="#" class="center-align"><i class="fas fa-chart-line fa-lg"></i><br>Métricas</a></li>
-      <li id="nav-panel" style="display: none;"><a href="#" class="center-align"><i class="fas fa-tools fa-lg"></i><br>Admin</a></li>
+    <!-- 📁 Menú principal centrado -->
+    <ul class="hide-on-med-and-down" style="display: flex; justify-content: center; align-items: flex-end; flex-grow: 1; gap: 2rem;">
+      <li><a href="index.html" class="center-align white-text"><i class="fas fa-home fa-lg"></i><br>Inicio</a></li>
+      <li><a href="productos.html" class="center-align white-text"><i class="fas fa-box-open fa-lg"></i><br>Productos</a></li>
+      <li><a href="categorias.html" class="center-align white-text"><i class="fas fa-tags fa-lg"></i><br>Categorías</a></li>
+      <li><a href="carrito.html" class="center-align white-text"><i class="fas fa-shopping-cart fa-lg"></i><br>Carrito (<span id="contador-carrito">0</span>)</a></li>
 
-      <!-- 👤 Cuenta -->
-      <li>
-        <a class="dropdown-trigger center-align" href="#!" data-target="cuentaDropdown" style="display: flex; flex-direction: column; align-items: center;">
+      <!-- 🔐 Menús para usuarios autenticados -->
+      <li id="nav-pedidos" style="display: none;"><a href="misPedidos.html" class="center-align white-text"><i class="fas fa-receipt fa-lg"></i><br>Pedidos</a></li>
+      <li id="nav-configuracion" style="display: none;"><a href="#" class="center-align white-text"><i class="fas fa-cog fa-lg"></i><br>Configuración</a></li>
+      <li id="nav-metricas" style="display: none;"><a href="#" class="center-align white-text"><i class="fas fa-chart-line fa-lg"></i><br>Métricas</a></li>
+      <li id="nav-panel" style="display: none;"><a href="#" class="center-align white-text"><i class="fas fa-tools fa-lg"></i><br>Admin</a></li>
+
+      <!-- 🔓 Menús para no autenticados -->
+      <li id="nav-login" style="display: none;"><a href="login.html" class="center-align white-text"><i class="fas fa-sign-in-alt fa-lg"></i><br>Ingresar</a></li>
+      <li id="nav-registro" style="display: none;"><a href="registro.html" class="center-align white-text"><i class="fas fa-user-plus fa-lg"></i><br>Registro</a></li>
+    </ul>
+
+    <!-- 👤 Dropdown cuenta -->
+    <ul id="cuentaDropdown" class="dropdown-content glass-dropdown z-depth-2">
+      <li><a href="cuenta.html"><i class="fas fa-user-edit left"></i> Perfil</a></li>
+      <li><a href="#" id="cerrarSesion"><i class="fas fa-sign-out-alt left"></i> Cerrar sesión</a></li>
+    </ul>
+
+    <!-- Avatar a la derecha (si logueado) -->
+    <ul class="right hide-on-med-and-down" style="margin-right: 1rem;">
+      <li id="nav-cuenta" style="display: none;">
+        <a class="dropdown-trigger center-align white-text" href="#!" data-target="cuentaDropdown" style="display: flex; flex-direction: column; align-items: center;">
           <img src="./imagenes/logo.jpeg" class="circle" alt="Avatar" style="width: 32px; height: 32px;" />
-          <span id="usuario-info" class="white-text" style="margin-top: 4px;">Erick</span>
+          <span id="usuario-info" style="margin-top: 4px;">Usuario</span>
         </a>
       </li>
     </ul>
   </div>
 </nav>
-
-<!-- 📥 Dropdown cuenta -->
-<ul id="cuentaDropdown" class="dropdown-content glass-dropdown z-depth-2">
-  <li id="menu-perfil-desktop" style="display: none;"><a href="cuenta.html"><i class="fas fa-user-edit left"></i> Perfil</a></li>
-  <li id="menu-registro" style="display: none;"><a href="registro.html"><i class="fas fa-user-plus left"></i> Registrarse</a></li>
-  <li id="menu-login-desktop" style="display: none;"><a href="login.html"><i class="fas fa-sign-in-alt left"></i> Iniciar sesión</a></li>
-  <li id="menu-logout-desktop" style="display: none;"><a href="#"><i class="fas fa-sign-out-alt left"></i> Cerrar sesión</a></li>
-</ul>

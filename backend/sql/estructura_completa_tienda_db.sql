@@ -58,22 +58,28 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 
 -- ════════════════════════════════════════════════════════════════════
--- 📦 📜 MÓDULO: AUDITORIA_ERRORES
+-- 📦 📜 MÓDULO: AUDITORIA_ERRORES (Versión Extendida)
 -- ════════════════════════════════════════════════════════════════════
--- Registro de errores y excepciones en el sistema, con trazabilidad
--- y detalles de contexto. Utilizado para depuración y soporte técnico.
+-- Registro de errores y excepciones en el sistema.
+-- Incluye trazabilidad completa con dirección IP, agente del usuario,
+-- módulo origen, detalles SQL, y entrada original en formato JSON.
 -- =====================================================================
 CREATE TABLE IF NOT EXISTS auditoria_errores (
-  log_id INT AUTO_INCREMENT PRIMARY KEY,
-  fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  modulo VARCHAR(100),
-  procedimiento VARCHAR(100),
-  usuario_id INT,
-  datos_entrada JSON,
-  `sqlstate` VARCHAR(10),
-  `mysql_errno` INT,
-  mensaje TEXT
-);
+  log_id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Identificador único del registro',
+  fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora del registro',
+
+  modulo VARCHAR(100) NOT NULL COMMENT 'Nombre lógico del módulo (ej. Middleware, Pedido, Usuario)',
+  procedimiento VARCHAR(100) NOT NULL COMMENT 'Función o procedimiento donde ocurrió el error',
+  usuario_id INT NULL COMMENT 'ID del usuario relacionado (si aplica)',
+  direccion_ip VARCHAR(50) DEFAULT NULL COMMENT 'IP del cliente que originó el error',
+  user_agent VARCHAR(255) DEFAULT NULL COMMENT 'Agente del navegador o cliente (User-Agent)',
+
+  datos_entrada JSON NULL COMMENT 'Datos enviados por el cliente (body en JSON)',
+  sqlstate VARCHAR(10) DEFAULT NULL COMMENT 'Código SQLSTATE o error lógico de aplicación',
+  mysql_errno INT DEFAULT NULL COMMENT 'Código de error MySQL simulado o real (ej. 1064, 1048)',
+  mensaje TEXT NOT NULL COMMENT 'Mensaje de error o detalles concatenados'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- ================================================================
 -- 📦 MÓDULO: estados_pedido + pedidos
@@ -3514,6 +3520,15 @@ VALUES
 ('blogger', 'Usuario con capacidad para escribir entradas de blog y responder comentarios.',
  JSON_OBJECT(
    'blog', JSON_OBJECT('crear', true, 'responder', true)
+))
+
+-- 👨‍💼 CANDIDATO
+('candidato', 'Usuario que aplica a oportunidades laborales o colaboraciones.',
+ JSON_OBJECT(
+   'perfil_laboral', JSON_OBJECT('ver', true, 'modificar', true),
+   'documentos', JSON_OBJECT('subir', true, 'ver', true),
+   'entrevistas', JSON_OBJECT('consultar', true),
+   'estado_postulacion', JSON_OBJECT('ver', true)
 ))
 
 ON DUPLICATE KEY UPDATE descripcion = VALUES(descripcion), permisos_json = VALUES(permisos_json);

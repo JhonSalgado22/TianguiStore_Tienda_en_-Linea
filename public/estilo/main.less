@@ -1,254 +1,208 @@
-/* LESS generado y corregido para TianguiStore - Estilo Glassmorphism Oscuro Mejorado */
-/* Incluye fondo animado, sombras refinadas, tarjetas responsivas, y botones refinados */
-/* Listo para compilar a CSS con herramientas como lessc */
-
 /* =======================================================
-   🎨 TianguiStore - Estilo Oscuro Glassmorphism Mejorado
+   🎨 TianguiStore - Estilo Oscuro Mexica Glassmorphism
    ======================================================= */
 
-/* ========== 🎨 VARIABLES ========= */
-@dark-bg: #0a0a0a;
-@panel-bg: rgba(18, 18, 18, 0.9);
-@card-bg: rgba(20, 20, 20, 0.95);
-@text-main: #d8d8d8;
-@text-muted: #999999;
+/* === 🎨 PALETA MEXICA OSCURA === */
+@dark-bg: #081c1b;
+@panel-bg: rgba(8, 28, 27, 0.9);
+@card-bg: rgba(14, 34, 33, 0.96);
+@text-main: #e0e0e0;
+@text-muted: #cccccc;
 
-@primary-accent: #00acc1;
-@secondary-accent: #ffc107;
+@primary-accent: #00acc1;   // Turquesa profundo
+@secondary-accent: #d4a03f; // Oro Mexica
 
-@glass-bg: rgba(20, 20, 20, 0.75);
+@glass-bg: rgba(14, 34, 33, 0.75);
 @glass-blur: 16px;
-@glass-border: rgba(255, 255, 255, 0.04);
+@glass-border: rgba(255, 255, 255, 0.06);
 
 @border-radius: 0.75rem;
 @transition-time: 0.3s;
-@card-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+@card-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 
-/* ========== 🧱 BASE ========= */
+/* === BASE === */
 body {
   background-color: @dark-bg;
-  background-image: url('../imagenes/patron_dark.png');
+  background-image: url("../imagenes/patron_dark.png");
   background-size: 160px;
   background-attachment: fixed;
   background-repeat: repeat;
   color: @text-main;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   margin: 0;
   padding: 0;
   line-height: 1.6;
   animation: fadeIn 0.6s ease-in-out;
 }
 
-/* Enlaces */
+/* === ENLACES === */
 a {
-  color: lighten(@primary-accent, 8%);
+  color: lighten(@primary-accent, 10%);
   transition: color @transition-time;
   &:hover {
     color: @primary-accent;
   }
 }
 
-/* ========== TIPOGRAFÍA ========= */
+/* === TIPOGRAFÍA === */
 h1, h2, h3, h4, h5, h6 {
-  color: white;
+  color: @secondary-accent;
   font-weight: 600;
   margin-bottom: 1rem;
-  letter-spacing: 0.5px;
 }
 p, span, label {
   color: @text-muted;
 }
 
-/* ========== NAVBAR y FOOTER ========= */
-nav, footer.page-footer {
+/* === NAVBAR === */
+nav {
   background-color: @glass-bg !important;
   backdrop-filter: blur(@glass-blur);
   -webkit-backdrop-filter: blur(@glass-blur);
   border-bottom: 1px solid @glass-border;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
-  z-index: 1000;
 }
 
-/* LOGO Y NOMBRE */
+/* === LOGO === */
 .brand-logo {
   display: flex !important;
   align-items: center;
-  max-width: 260px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  img {
-    width: 36px;
-    height: 36px;
-    margin-right: 6px;
-    flex-shrink: 0;
-  }
   span {
     font-size: 1.2rem;
     font-weight: 600;
-    color: white;
+    color: @secondary-accent;
   }
 }
 
-/* DROPDOWN CORRECTO */
-.dropdown-content.glass-dropdown {
-  background-color: @glass-bg;
+/* === FORMULARIO === */
+.glass-card,
+.card-panel {
+  background: @card-bg;
   backdrop-filter: blur(@glass-blur);
   border: 1px solid @glass-border;
+  border-radius: @border-radius;
   box-shadow: @card-shadow;
+  padding: 2rem;
   color: @text-main;
-  max-height: none !important;
-  overflow-y: visible !important;
-  z-index: 1002 !important;
-  li > a {
+}
+
+/* === CAMPOS DE ENTRADA === */
+.input-field {
+  position: relative;
+
+  .prefix {
     color: @text-main !important;
+    opacity: 0.95;
+    transition: color @transition-time;
+  }
+
+  input, textarea, select {
+    background-color: rgba(0, 0, 0, 0.15);
+    border: none;
+    border-bottom: 1px solid fade(@primary-accent, 50%);
+    color: @text-main;
+    transition: border-bottom @transition-time, box-shadow @transition-time;
+  }
+
+  input:focus, textarea:focus {
+    border-bottom: 2px solid @secondary-accent;
+    box-shadow: 0 1px 0 0 @secondary-accent;
+  }
+
+  label {
+    color: @text-muted;
+    transition: color @transition-time;
+  }
+
+  input:focus + label, textarea:focus + label {
+    color: @secondary-accent;
+  }
+
+  /* Fecha/hora picker */
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(100%);
+  }
+}
+
+/* === TOGGLE-PASSWORD (mostrar/ocultar) === */
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  transform: translateY(-50%);
+  z-index: 2;
+  cursor: pointer;
+  color: @text-main;
+  font-size: 1.2rem;
+  user-select: none;
+}
+
+/* === VALIDACIONES VISUALES === */
+.input-field input.valid {
+  border-bottom: 2px solid lighten(green, 10%);
+  box-shadow: 0 1px 0 0 lighten(green, 10%);
+}
+.input-field input.invalid {
+  border-bottom: 2px solid lighten(red, 10%);
+  box-shadow: 0 1px 0 0 lighten(red, 10%);
+}
+
+/* === HELPER-TEXT === */
+.helper-text {
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin-top: 0.5rem;
+  display: block;
+  color: @text-main !important;
+
+  &.red-text,
+  &.green-text,
+  &.amber-text {
     display: flex;
     align-items: center;
-    padding: 0.8rem 1.2rem;
-    i {
-      margin-right: 8px;
-    }
+    gap: 0.4rem;
+    margin-top: 0.3rem;
   }
-  li:hover {
-    background-color: lighten(@glass-bg, 6%);
-  }
-}
 
-/* CONTENEDOR GRID */
-#productos-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  padding: 3rem 1rem;
-}
-
-/* TARJETA DE PRODUCTO */
-.card.producto {
-  background-color: @glass-bg;
-  backdrop-filter: blur(@glass-blur);
-  border-radius: @border-radius;
-  box-shadow: @card-shadow;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: transform @transition-time ease, box-shadow @transition-time ease;
-  animation: scaleIn 0.4s ease;
-  height: 100%;
-  min-height: 440px;
-  .producto-imagen {
-    width: 100%;
-    max-width: 160px;
-    height: 160px;
-    object-fit: contain;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-    margin-bottom: 1.2rem;
-    background-color: @card-bg;
+  &.red-text {
+    color: #ff5252 !important;
   }
-  .card-title {
+  &.green-text {
+    color: #69f0ae !important;
+  }
+  &.amber-text {
+    color: #ffd740 !important;
+  }
+
+  .material-icons {
     font-size: 1.1rem;
-    font-weight: bold;
-    color: lighten(@text-main, 10%);
-    margin-bottom: 0.5rem;
-    text-align: center;
-    line-height: 1.4;
-    min-height: 2.6rem;
-  }
-  .card-info {
-    font-size: 0.95rem;
-    color: @text-muted;
-    margin-bottom: 0.8rem;
-    text-align: left;
-    line-height: 1.5;
-    max-width: 100%;
-    white-space: normal;
-  }
-  .card-precio {
-    font-size: 1rem;
-    color: @text-main;
-    margin-bottom: 1rem;
-  }
-  .btn-agregar {
-    margin-top: auto;
-    background-color: @primary-accent;
-    color: @dark-bg;
-    font-weight: 600;
-    border-radius: @border-radius;
-    padding: 0.7rem 1.2rem;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    transition: all @transition-time ease;
-    i {
-      margin-right: 0.5rem;
-    }
-    &:hover {
-      background-color: darken(@primary-accent, 10%);
-      transform: scale(1.04);
-    }
+    position: relative;
+    top: 1px;
   }
 }
 
-/* BOTONES */
-.btn {
+/* === BOTONES === */
+button[type="submit"].btn-large {
+  background-color: @secondary-accent;
+  color: @dark-bg;
+  font-weight: bold;
   border-radius: @border-radius;
-  font-weight: 500;
-  transition: all @transition-time ease;
-  &.amber {
-    background-color: @primary-accent;
-    color: @dark-bg;
-    &:hover {
-      background-color: darken(@primary-accent, 10%);
-    }
-  }
-  &.danger {
-    background-color: #e53935;
-    &:hover {
-      background-color: darken(#e53935, 8%);
-    }
-  }
-  &.secondary {
-    background-color: #2e2e2e;
-    &:hover {
-      background-color: lighten(#2e2e2e, 8%);
-    }
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: all @transition-time;
+  &:hover {
+    background-color: darken(@secondary-accent, 8%);
+    transform: scale(1.03);
   }
 }
 
-/* SECCIONES */
-.section {
-  padding: 4rem 2rem;
-  animation: fadeUp 0.6s ease;
-}
-
-/* TOASTS */
-#toast-container {
-  position: fixed;
-  bottom: 1rem;
-  right: 1rem;
-  z-index: 10000;
-  .toast {
-    background-color: @primary-accent;
-    color: black;
-    border-radius: @border-radius;
-    padding: 1rem 1.5rem;
-    box-shadow: @card-shadow;
-    animation: fadeInDown 0.5s ease;
-  }
-}
-
-/* ANIMACIONES */
+/* === ANIMACIONES === */
 @keyframes fadeIn {
   0% { opacity: 0; }
   100% { opacity: 1; }
 }
 @keyframes fadeInDown {
   0% { opacity: 0; transform: translateY(-20px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeUp {
-  0% { opacity: 0; transform: translateY(20px); }
   100% { opacity: 1; transform: translateY(0); }
 }
 @keyframes scaleIn {

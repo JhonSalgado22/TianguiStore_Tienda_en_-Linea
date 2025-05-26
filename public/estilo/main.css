@@ -1,222 +1,175 @@
-/* LESS generado y corregido para TianguiStore - Estilo Glassmorphism Oscuro Mejorado */
-/* Incluye fondo animado, sombras refinadas, tarjetas responsivas, y botones refinados */
-/* Listo para compilar a CSS con herramientas como lessc */
 /* =======================================================
-   🎨 TianguiStore - Estilo Oscuro Glassmorphism Mejorado
+   🎨 TianguiStore - Estilo Oscuro Mexica Glassmorphism
    ======================================================= */
-/* ========== 🎨 VARIABLES ========= */
-/* ========== 🧱 BASE ========= */
+/* === 🎨 PALETA MEXICA OSCURA === */
+/* === BASE === */
 body {
-  background-color: #0a0a0a;
-  background-image: url('../imagenes/patron_dark.png');
+  background-color: #081c1b;
+  background-image: url("../imagenes/patron_dark.png");
   background-size: 160px;
   background-attachment: fixed;
   background-repeat: repeat;
-  color: #d8d8d8;
-  font-family: 'Roboto', sans-serif;
+  color: #e0e0e0;
+  font-family: "Roboto", sans-serif;
   margin: 0;
   padding: 0;
   line-height: 1.6;
   animation: fadeIn 0.6s ease-in-out;
 }
-/* Enlaces */
+/* === ENLACES === */
 a {
-  color: #00d0ea;
+  color: #00d9f4;
   transition: color 0.3s;
 }
 a:hover {
   color: #00acc1;
 }
-/* ========== TIPOGRAFÍA ========= */
+/* === TIPOGRAFÍA === */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  color: white;
+  color: #d4a03f;
   font-weight: 600;
   margin-bottom: 1rem;
-  letter-spacing: 0.5px;
 }
 p,
 span,
 label {
-  color: #999999;
+  color: #cccccc;
 }
-/* ========== NAVBAR y FOOTER ========= */
-nav,
-footer.page-footer {
-  background-color: rgba(20, 20, 20, 0.75) !important;
+/* === NAVBAR === */
+nav {
+  background-color: rgba(14, 34, 33, 0.75) !important;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
-  z-index: 1000;
 }
-/* LOGO Y NOMBRE */
+/* === LOGO === */
 .brand-logo {
   display: flex !important;
   align-items: center;
-  max-width: 260px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.brand-logo img {
-  width: 36px;
-  height: 36px;
-  margin-right: 6px;
-  flex-shrink: 0;
 }
 .brand-logo span {
   font-size: 1.2rem;
   font-weight: 600;
-  color: white;
+  color: #d4a03f;
 }
-/* DROPDOWN CORRECTO */
-.dropdown-content.glass-dropdown {
-  background-color: rgba(20, 20, 20, 0.75);
+/* === FORMULARIO === */
+.glass-card,
+.card-panel {
+  background: rgba(14, 34, 33, 0.96);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  color: #d8d8d8;
-  max-height: none !important;
-  overflow-y: visible !important;
-  z-index: 1002 !important;
-}
-.dropdown-content.glass-dropdown li > a {
-  color: #d8d8d8 !important;
-  display: flex;
-  align-items: center;
-  padding: 0.8rem 1.2rem;
-}
-.dropdown-content.glass-dropdown li > a i {
-  margin-right: 8px;
-}
-.dropdown-content.glass-dropdown li:hover {
-  background-color: rgba(35, 35, 35, 0.75);
-}
-/* CONTENEDOR GRID */
-#productos-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-  padding: 3rem 1rem;
-}
-/* TARJETA DE PRODUCTO */
-.card.producto {
-  background-color: rgba(20, 20, 20, 0.75);
-  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 0.75rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  animation: scaleIn 0.4s ease;
-  height: 100%;
-  min-height: 440px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  padding: 2rem;
+  color: #e0e0e0;
 }
-.card.producto .producto-imagen {
-  width: 100%;
-  max-width: 160px;
-  height: 160px;
-  object-fit: contain;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-  margin-bottom: 1.2rem;
-  background-color: rgba(20, 20, 20, 0.95);
+/* === CAMPOS DE ENTRADA === */
+.input-field {
+  position: relative;
+  /* Fecha/hora picker */
 }
-.card.producto .card-title {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: #f2f2f2;
-  margin-bottom: 0.5rem;
-  text-align: center;
+.input-field .prefix {
+  color: #e0e0e0 !important;
+  opacity: 0.95;
+  transition: color 0.3s;
+}
+.input-field input,
+.input-field textarea,
+.input-field select {
+  background-color: rgba(0, 0, 0, 0.15);
+  border: none;
+  border-bottom: 1px solid rgba(0, 172, 193, 0.5);
+  color: #e0e0e0;
+  transition: border-bottom 0.3s, box-shadow 0.3s;
+}
+.input-field input:focus,
+.input-field textarea:focus {
+  border-bottom: 2px solid #d4a03f;
+  box-shadow: 0 1px 0 0 #d4a03f;
+}
+.input-field label {
+  color: #cccccc;
+  transition: color 0.3s;
+}
+.input-field input:focus + label,
+.input-field textarea:focus + label {
+  color: #d4a03f;
+}
+.input-field input[type="date"]::-webkit-calendar-picker-indicator,
+.input-field input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(100%);
+}
+/* === TOGGLE-PASSWORD (mostrar/ocultar) === */
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  transform: translateY(-50%);
+  z-index: 2;
+  cursor: pointer;
+  color: #e0e0e0;
+  font-size: 1.2rem;
+  user-select: none;
+}
+/* === VALIDACIONES VISUALES === */
+.input-field input.valid {
+  border-bottom: 2px solid #00b300;
+  box-shadow: 0 1px 0 0 #00b300;
+}
+.input-field input.invalid {
+  border-bottom: 2px solid #ff3333;
+  box-shadow: 0 1px 0 0 #ff3333;
+}
+/* === HELPER-TEXT === */
+.helper-text {
+  font-size: 0.9rem;
   line-height: 1.4;
-  min-height: 2.6rem;
+  margin-top: 0.5rem;
+  display: block;
+  color: #e0e0e0 !important;
 }
-.card.producto .card-info {
-  font-size: 0.95rem;
-  color: #999999;
-  margin-bottom: 0.8rem;
-  text-align: left;
-  line-height: 1.5;
-  max-width: 100%;
-  white-space: normal;
-}
-.card.producto .card-precio {
-  font-size: 1rem;
-  color: #d8d8d8;
-  margin-bottom: 1rem;
-}
-.card.producto .btn-agregar {
-  margin-top: auto;
-  background-color: #00acc1;
-  color: #0a0a0a;
-  font-weight: 600;
-  border-radius: 0.75rem;
-  padding: 0.7rem 1.2rem;
-  width: 100%;
+.helper-text.red-text,
+.helper-text.green-text,
+.helper-text.amber-text {
   display: flex;
-  justify-content: center;
-  transition: all 0.3s ease;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
 }
-.card.producto .btn-agregar i {
-  margin-right: 0.5rem;
+.helper-text.red-text {
+  color: #ff5252 !important;
 }
-.card.producto .btn-agregar:hover {
-  background-color: #007f8e;
-  transform: scale(1.04);
+.helper-text.green-text {
+  color: #69f0ae !important;
 }
-/* BOTONES */
-.btn {
+.helper-text.amber-text {
+  color: #ffd740 !important;
+}
+.helper-text .material-icons {
+  font-size: 1.1rem;
+  position: relative;
+  top: 1px;
+}
+/* === BOTONES === */
+button[type="submit"].btn-large {
+  background-color: #d4a03f;
+  color: #081c1b;
+  font-weight: bold;
   border-radius: 0.75rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s;
 }
-.btn.amber {
-  background-color: #00acc1;
-  color: #0a0a0a;
+button[type="submit"].btn-large:hover {
+  background-color: #bf8c2b;
+  transform: scale(1.03);
 }
-.btn.amber:hover {
-  background-color: #007f8e;
-}
-.btn.danger {
-  background-color: #e53935;
-}
-.btn.danger:hover {
-  background-color: #d6201c;
-}
-.btn.secondary {
-  background-color: #2e2e2e;
-}
-.btn.secondary:hover {
-  background-color: #424242;
-}
-/* SECCIONES */
-.section {
-  padding: 4rem 2rem;
-  animation: fadeUp 0.6s ease;
-}
-/* TOASTS */
-#toast-container {
-  position: fixed;
-  bottom: 1rem;
-  right: 1rem;
-  z-index: 10000;
-}
-#toast-container .toast {
-  background-color: #00acc1;
-  color: black;
-  border-radius: 0.75rem;
-  padding: 1rem 1.5rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  animation: fadeInDown 0.5s ease;
-}
-/* ANIMACIONES */
+/* === ANIMACIONES === */
 @keyframes fadeIn {
   0% {
     opacity: 0;
@@ -229,16 +182,6 @@ footer.page-footer {
   0% {
     opacity: 0;
     transform: translateY(-20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@keyframes fadeUp {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
   }
   100% {
     opacity: 1;

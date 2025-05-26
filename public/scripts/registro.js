@@ -1,132 +1,227 @@
 /**
  * 📦 registro.js
- * Registro de usuarios con campos extendidos, validaciones, confirmación de contraseña y retroalimentación visual.
- * Autor: I.S.C. Erick Renato Vega Ceron | Mayo 2025
+ * Registro elegante, accesible y dinámico. Soporte completo para MaterializeCSS.
+ * Autor: I.S.C. Erick Renato Vega Ceron | Versión unificada y mejorada - Mayo 2025
  */
+(() => {
+  const $ = s => document.querySelector(s);
+  const $$ = s => Array.from(document.querySelectorAll(s));
+  const showToast = (msg, cls = 'red darken-2') =>
+    M.toast({ html: msg, classes: `rounded ${cls}` });
 
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("registroForm");
-  const password = document.getElementById("password");
-  const confirmPassword = document.getElementById("confirmPassword");
-  const fuerzaPassword = document.getElementById("fuerzaPassword");
-  const mensajeConfirmacion = document.getElementById("mensajeConfirmacion");
-
-  const campos = {
-    nombre: document.getElementById("nombre"),
-    apellido_paterno: document.getElementById("apellido_paterno"),
-    apellido_materno: document.getElementById("apellido_materno"),
-    genero: document.getElementById("genero"),
-    fecha_nacimiento: document.getElementById("fecha_nacimiento"),
-    telefono: document.getElementById("telefono"),
-    direccion: document.getElementById("direccion"),
-    correo_electronico: document.getElementById("email"),
-    contrasena: password,
-    foto_perfil_url: document.getElementById("foto_perfil_url"),
-    biografia: document.getElementById("biografia"),
-    origen_reclutamiento: document.getElementById("origen_reclutamiento"),
-    cv_url: document.getElementById("cv_url"),
-    portafolio_url: document.getElementById("portafolio_url")
+  const validators = {
+    nombre: { fn: v => v.length > 0, err: '⚠️ El nombre es obligatorio.' },
+    email: {
+      fn: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+      err: '⚠️ Correo electrónico inválido.'
+    },
+    password: {
+      fn: v => /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(v),
+      err: '⚠️ La contraseña debe tener al menos 8 caracteres, una letra y un número.'
+    },
+    confirmPassword: {
+      fn: (v, all) => v === all.password,
+      err: '⚠️ Las contraseñas no coinciden.'
+    },
+    tipoCuenta: {
+      fn: v => ['cliente', 'vendedor', 'soporte'].includes(v),
+      err: '⚠️ Selecciona un tipo de cuenta válido.'
+    },
+    como_conociste: {
+      fn: v => !!v,
+      err: '⚠️ Selecciona cómo conociste TianguiStore.'
+    },
+    otro_como_conociste: {
+      fn: (v, all) => all.como_conociste !== 'otro' || (v && v.length >= 2),
+      err: '⚠️ Especifica cómo conociste TianguiStore si elegiste “Otro”.'
+    },
+    foto_perfil_url: urlOpt('foto de perfil'),
+    cv_url: urlOpt('CV'),
+    portafolio_url: urlOpt('portafolio'),
+    sitio_web: urlOpt('sitio web')
   };
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
-  const urlRegex = /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,6})([\/\w .-]*)*\/?$/i;
-
-  password.addEventListener("input", () => {
-    const val = password.value;
-    let msg = "Seguridad: Débil", clase = "red-text";
-    if (val.length >= 12 && /[A-Z]/.test(val) && /\d/.test(val) && /[!@#$%^&*]/.test(val)) {
-      msg = "Seguridad: Fuerte"; clase = "green-text";
-    } else if (val.length >= 8 && /[A-Za-z]/.test(val) && /\d/.test(val)) {
-      msg = "Seguridad: Aceptable"; clase = "amber-text";
-    }
-    fuerzaPassword.textContent = msg;
-    fuerzaPassword.className = `helper-text ${clase}`;
-  });
-
-  confirmPassword.addEventListener("input", () => {
-    const coincide = password.value === confirmPassword.value;
-    mensajeConfirmacion.innerHTML = coincide
-      ? '<i class="material-icons green-text">check_circle</i> Coincide'
-      : '<i class="material-icons red-text">cancel</i> No coincide';
-  });
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    ocultarMensajes();
-
-    const datos = obtenerDatosLimpios();
-    const errores = validarCampos(datos);
-
-    if (errores.length > 0) {
-      errores.forEach(msg => mostrarToast(msg, "red darken-2"));
-      return;
-    }
-
-    try {
-      const res = await fetch("/auth/registro", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...datos, confirmar_contrasena: confirmPassword.value.trim() })
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        console.error("❌ Error del backend:", result);
-        mostrarToast(result.message || "❌ Error durante el registro.", "red darken-3");
-        return;
-      }
-
-      mostrarToast("✅ Registro exitoso. Redirigiendo...", "green darken-2");
-      form.reset();
-      mensajeConfirmacion.innerHTML = "";
-      fuerzaPassword.textContent = "";
-      setTimeout(() => (window.location.href = "login.html"), 2000);
-
-    } catch (error) {
-      console.error("❌ Error de red:", error);
-      mostrarToast("⚠️ No se pudo conectar con el servidor.", "red darken-3");
-    }
-  });
-
-  function obtenerDatosLimpios() {
+  function urlOpt(label) {
     return {
-      nombre: campos.nombre.value.trim(),
-      apellido_paterno: campos.apellido_paterno.value.trim() || null,
-      apellido_materno: campos.apellido_materno.value.trim() || null,
-      genero: campos.genero.value || "no_especificado",
-      fecha_nacimiento: campos.fecha_nacimiento.value || null,
-      telefono: campos.telefono.value.trim() || null,
-      direccion: campos.direccion.value.trim() || null,
-      correo_electronico: campos.correo_electronico.value.trim(),
-      contrasena: campos.contrasena.value.trim(),
-      foto_perfil_url: campos.foto_perfil_url?.value.trim() || null,
-      biografia: campos.biografia?.value.trim() || null,
-      origen_reclutamiento: campos.origen_reclutamiento?.value || "externo",
-      cv_url: campos.cv_url?.value.trim() || null,
-      portafolio_url: campos.portafolio_url?.value.trim() || null
+      fn: v => !v || /^(https?:\/\/)?([\w.-]+)\.[a-z]{2,6}([\/\w .-]*)*\/?$/.test(v),
+      err: `⚠️ URL inválida en ${label}.`
     };
   }
 
-  function validarCampos(datos) {
-    const errores = [];
-    if (!datos.nombre) errores.push("⚠️ El nombre es obligatorio.");
-    if (!emailRegex.test(datos.correo_electronico)) errores.push("⚠️ Correo electrónico inválido.");
-    if (!passwordRegex.test(datos.contrasena)) errores.push("⚠️ La contraseña debe tener al menos 8 caracteres, una letra y un número.");
-    if (datos.contrasena !== confirmPassword.value.trim()) errores.push("⚠️ Las contraseñas no coinciden.");
-    if (datos.foto_perfil_url && !urlRegex.test(datos.foto_perfil_url)) errores.push("⚠️ URL de foto inválida.");
-    if (datos.cv_url && !urlRegex.test(datos.cv_url)) errores.push("⚠️ URL de CV inválida.");
-    if (datos.portafolio_url && !urlRegex.test(datos.portafolio_url)) errores.push("⚠️ URL de portafolio inválida.");
-    return errores;
+  const dynamicFields = {
+    vendedor: `
+      <div class="row animate__animated animate__fadeInUp">
+        <div class="input-field col s12 m6">
+          <i class="fas fa-id-card prefix accent-icon"></i>
+          <input type="text" id="rfc" name="rfc" />
+          <label for="rfc">RFC</label>
+        </div>
+        <div class="input-field col s12 m6">
+          <i class="fas fa-globe prefix accent-icon"></i>
+          <input type="url" id="sitio_web" name="sitio_web" />
+          <label for="sitio_web">Sitio web</label>
+        </div>
+      </div>`,
+    soporte: `
+      <div class="row animate__animated animate__fadeInUp">
+        <div class="input-field col s12 m6">
+          <i class="fas fa-file-alt prefix accent-icon"></i>
+          <input type="url" id="cv_url" name="cv_url" />
+          <label for="cv_url">URL del CV</label>
+        </div>
+        <div class="input-field col s12 m6">
+          <i class="fas fa-briefcase prefix accent-icon"></i>
+          <input type="url" id="portafolio_url" name="portafolio_url" />
+          <label for="portafolio_url">Portafolio</label>
+        </div>
+        <div class="input-field col s12">
+          <i class="fas fa-user-edit prefix accent-icon"></i>
+          <textarea id="biografia" name="biografia" class="materialize-textarea"></textarea>
+          <label for="biografia">Biografía</label>
+        </div>
+      </div>`
+  };
+
+  function renderDynamic(tipo) {
+    $('#camposDinamicos').innerHTML = dynamicFields[tipo] || '';
+    M.updateTextFields();
+    M.FormSelect.init($$('select'));
   }
 
-  function mostrarToast(msg, color = "red darken-2") {
-    M.toast({ html: msg, classes: `rounded ${color}` });
+  function toggleOtro() {
+    const val = $('#como_conociste')?.value;
+    $('#campoOtroConociste')?.style.setProperty('display', val === 'otro' ? 'block' : 'none');
   }
 
-  function ocultarMensajes() {
-    const container = document.getElementById("toast-container");
-    if (container) container.innerHTML = "";
+  function collectData() {
+    const data = {};
+    $$('#registroForm [name]').forEach(el => {
+      data[el.name] = el.value.trim() || null;
+    });
+    return data;
   }
-});
+
+  function clearValidation() {
+    $$('input').forEach(i => i.classList.remove('valid', 'invalid'));
+  }
+
+  function applyValidation(field, ok) {
+    const el = $(`[name="${field}"]`);
+    if (!el) return;
+    el.classList.toggle('valid', ok);
+    el.classList.toggle('invalid', !ok);
+  }
+
+  function validateAll(data) {
+    const errors = [];
+    for (const [key, rule] of Object.entries(validators)) {
+      const valid = rule.fn(data[key], data);
+      applyValidation(key, valid);
+      if (!valid) errors.push(rule.err);
+    }
+    return errors;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    M.FormSelect.init($$('select'));
+    M.updateTextFields();
+
+    const tipoUsuario = $('#tipoUsuario');
+    const tipoOculto = $('#tipoCuenta');
+    const initTipo = localStorage.getItem('tipoCuentaSeleccionado') || tipoUsuario.value;
+    tipoUsuario.value = initTipo;
+    tipoOculto.value = initTipo;
+    M.FormSelect.init(tipoUsuario);
+    renderDynamic(initTipo);
+
+    tipoUsuario.addEventListener('change', () => {
+      const tipo = tipoUsuario.value;
+      tipoOculto.value = tipo;
+      localStorage.setItem('tipoCuentaSeleccionado', tipo);
+      renderDynamic(tipo);
+    });
+
+    $('#como_conociste')?.addEventListener('change', toggleOtro);
+    toggleOtro();
+
+    document.body.addEventListener('click', e => {
+      const btn = e.target.closest('.toggle-password');
+      if (!btn) return;
+      const input = document.getElementById(btn.dataset.target);
+      const icon = btn.querySelector('i');
+      if (!input || !icon) return;
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      icon.classList.toggle('fa-eye', show);
+      icon.classList.toggle('fa-eye-slash', !show);
+    });
+
+    $('#password')?.addEventListener('input', () => {
+      const val = $('#password').value;
+      const fuerza = $('#fuerzaPassword');
+      let nivel = { msg: 'Seguridad: Débil', cls: 'red-text', icon: 'cancel' };
+      if (val.length >= 12 && /[A-Z]/.test(val) && /\d/.test(val) && /[!@#$%^&*]/.test(val)) {
+        nivel = { msg: 'Seguridad: Fuerte', cls: 'green-text', icon: 'check_circle' };
+      } else if (val.length >= 8 && /[A-Za-z]/.test(val) && /\d/.test(val)) {
+        nivel = { msg: 'Seguridad: Aceptable', cls: 'amber-text', icon: 'priority_high' };
+      }
+      fuerza.innerHTML = `<i class="material-icons ${nivel.cls}">${nivel.icon}</i> ${nivel.msg}`;
+      fuerza.className = `helper-text ${nivel.cls}`;
+    });
+
+    $('#confirmPassword')?.addEventListener('input', () => {
+      const match = $('#password').value === $('#confirmPassword').value;
+      const mensaje = $('#mensajeConfirmacion');
+      mensaje.innerHTML = match
+        ? '<i class="material-icons green-text">check_circle</i> Coincide'
+        : '<i class="material-icons red-text">cancel</i> No coincide';
+      mensaje.className = `helper-text ${match ? 'green-text' : 'red-text'}`;
+      $('#confirmPassword').classList.toggle('valid', match);
+      $('#confirmPassword').classList.toggle('invalid', !match);
+    });
+  });
+
+  document.addEventListener('submit', async e => {
+    if (e.target.id !== 'registroForm') return;
+    e.preventDefault();
+    clearValidation();
+    const data = collectData();
+    const errores = validateAll(data);
+    if (errores.length) return errores.forEach(showToast);
+
+    try {
+      const payload = {
+        correo_electronico: data.email,
+        contrasena: data.password,
+        confirmar_contrasena: data.confirmPassword,
+        tipo_cuenta: data.tipoCuenta,
+        nombre: data.nombre,
+        apellido_paterno: data.apellido_paterno,
+        apellido_materno: data.apellido_materno,
+        direccion: data.direccion,
+        telefono: data.telefono,
+        genero: data.genero,
+        fecha_nacimiento: data.fecha_nacimiento,
+        foto_perfil_url: data.foto_perfil_url,
+        biografia: data.biografia,
+        cv_url: data.cv_url,
+        portafolio_url: data.portafolio_url,
+        origen_reclutamiento: data.como_conociste,
+        otro_como_conociste: data.otro_como_conociste
+      };
+
+      const res = await fetch('/auth/registro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const out = await res.json();
+      if (!res.ok) throw new Error(out.message || 'Error en registro');
+      showToast('✅ Registro exitoso. Redirigiendo...', 'green darken-2');
+      setTimeout(() => location.href = 'login.html', 1800);
+    } catch (err) {
+      showToast(err.message || '⚠️ Error inesperado', 'red darken-3');
+    }
+  });
+})();

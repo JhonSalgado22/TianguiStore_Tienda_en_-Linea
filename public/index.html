@@ -23,7 +23,7 @@
 
   <!-- CONTENIDO PRINCIPAL -->
   <main class="container">
-    <!-- ENCABEZADO -->
+    <!-- ENCABEZADO DE BIENVENIDA -->
     <section class="section center-align">
       <div class="card-panel z-depth-3 grey darken-3 hoverable" style="border-radius: 12px;">
         <h1 class="white-text" style="font-size: 3rem;">
@@ -38,24 +38,22 @@
 
     <!-- PRODUCTOS DESTACADOS -->
     <section class="section">
-      <div class="row center-align">
-        <div class="col s12">
-          <h4 class="white-text">
-            <i class="fas fa-box-open amber-text text-accent-2"></i>
-            Nuestros Productos
-          </h4>
-          <p class="grey-text text-lighten-2">Selecciona tus favoritos y agrégalos al carrito</p>
-        </div>
-      </div>
+      <header class="center-align">
+        <h4 class="white-text">
+          <i class="fas fa-box-open amber-text text-accent-2"></i>
+          Nuestros Productos
+        </h4>
+        <p class="grey-text text-lighten-2">Selecciona tus favoritos y agrégalos al carrito</p>
+      </header>
 
-      <!-- CONTENEDOR DE PRODUCTOS -->
-      <div class="row" id="productos-container" aria-live="polite">
-        <!-- Las tarjetas de productos se cargarán dinámicamente desde productos.js -->
+      <!-- CONTENEDOR DE TARJETAS CON GRID -->
+      <div id="productos-container" aria-live="polite">
+        <!-- Las tarjetas de productos se insertan dinámicamente desde productos.js -->
       </div>
     </section>
   </main>
 
-  <!-- TOASTS -->
+  <!-- TOASTS (mensajes flotantes) -->
   <div id="toast-container" class="fixed-action-btn" aria-hidden="true"></div>
 
   <!-- FOOTER dinámico -->
