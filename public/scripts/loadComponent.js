@@ -1,6 +1,7 @@
 /**
  * 📦 loadComponent.js
  * Carga dinámica de Navbar y Footer, aplica tema, y controla visibilidad por sesión.
+ * Adaptado con menús/submenús y roles.
  * Autor: I.S.C. Erick Renato Vega Ceron — Mayo 2025
  */
 
@@ -30,7 +31,8 @@ async function cargarNavbar() {
     contenedor.innerHTML = await res.text();
     contenedor.classList.add("animate__animated", "animate__fadeInDown");
 
-    gestionarVisibilidadMenus();
+    gestionarVisibilidadMenus(); // 🔐 Visibilidad y roles
+    inicializarMaterialize(); // Asegura dropdowns y collapsibles
   } catch (err) {
     console.error("❌ Navbar:", err);
     contenedor.innerHTML = `<nav class="red darken-4 center-align">⚠️ Error al cargar menú</nav>`;
@@ -89,8 +91,7 @@ function inicializarMaterialize() {
     coverTrigger: false,
     alignment: "right"
   });
-
-  // Importante: inits para selects también
+  M.Collapsible.init(document.querySelectorAll(".collapsible"));
   M.FormSelect.init(document.querySelectorAll("select"));
 }
 
@@ -109,62 +110,61 @@ function actualizarContadorCarrito() {
 }
 
 /* ══════════════════════════════════════
-   🔐 VISIBILIDAD DE MENÚ POR SESIÓN
+   🔐 VISIBILIDAD DE MENÚ POR SESIÓN Y ROL
 ═══════════════════════════════════════ */
 
 function gestionarVisibilidadMenus() {
   const token = localStorage.getItem("token");
   const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
   const permisos = usuario?.permisos || {};
-  const usuarioInfo = document.getElementById("usuario-info");
+  const menuUsuario = document.getElementById("menu-usuario");
 
-  const mostrar = (ids, visible = true) => {
-    [].concat(ids).forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = visible ? "block" : "none";
-    });
-  };
+  if (!menuUsuario) return;
 
-  const menus = {
-    login: ["menu-login", "menu-login-desktop", "menu-login-mobile"],
-    registro: ["menu-registro", "menu-registro-mobile"],
-    logout: ["menu-logout", "menu-logout-desktop", "menu-logout-mobile"],
-    perfil: ["menu-perfil-desktop", "menu-perfil-mobile"],
-    pedidos: ["nav-pedidos", "nav-pedidos-mobile"],
-    usuarios: ["nav-usuarios", "nav-usuarios-mobile"],
-    configuracion: ["nav-configuracion"],
-    metricas: ["nav-metricas"],
-    panel: ["nav-panel"]
-  };
-
-  // Ocultar todo por defecto
-  Object.values(menus).flat().forEach(id => mostrar(id, false));
+  menuUsuario.innerHTML = ""; // Limpiar menú anterior
 
   if (!token || !usuario) {
-    mostrar([...menus.login, ...menus.registro], true);
-    if (usuarioInfo) usuarioInfo.textContent = "Cuenta";
+    menuUsuario.innerHTML = `
+      <li id="menu-login-desktop"><a href="login.html"><i class="fas fa-sign-in-alt left"></i> Iniciar sesión</a></li>
+      <li id="menu-registro"><a href="registro.html"><i class="fas fa-user-plus left"></i> Crear cuenta</a></li>
+    `;
     return;
   }
 
-  // Sesión iniciada
-  mostrar([...menus.logout, ...menus.perfil, ...menus.pedidos], true);
-  if (usuarioInfo) usuarioInfo.textContent = usuario.nombre || usuario.correo || "Usuario";
+  // Usuario autenticado
+  const nombre = usuario.nombre || usuario.correo || "Usuario";
 
-  // Permisos por rol
-  if (permisos.usuarios?.leer) mostrar(menus.usuarios, true);
-  if (permisos.configuracion?.leer) mostrar(menus.configuracion, true);
-  if (permisos.reportes?.exportar) mostrar(menus.metricas, true);
+  menuUsuario.innerHTML = `
+    <li>
+      <a class="dropdown-trigger" href="#!" data-target="dropdown-usuario">
+        <i class="fas fa-user-circle left"></i> <span id="usuario-info">${nombre}</span> <i class="fas fa-caret-down right"></i>
+      </a>
+    </li>
+  `;
 
-  if (
-    permisos.usuarios?.leer ||
-    permisos.productos?.leer ||
-    permisos.configuracion?.leer ||
-    permisos.reportes?.exportar
-  ) {
-    mostrar(menus.panel, true);
-  }
+  // Generar dropdown
+  const dropdown = document.createElement("ul");
+  dropdown.id = "dropdown-usuario";
+  dropdown.className = "dropdown-content";
 
-  asignarLogout(menus.logout);
+  dropdown.innerHTML = `
+    <li><a href="perfil.html" id="menu-perfil-desktop"><i class="fas fa-user left"></i> Mi Perfil</a></li>
+    ${permisos.admin ? `<li><a href="adminPanel.html" id="nav-panel"><i class="fas fa-cogs left"></i> Panel Admin</a></li>` : ""}
+    ${permisos.usuarios?.leer ? `<li><a href="usuarios.html" id="nav-usuarios"><i class="fas fa-users left"></i> Usuarios</a></li>` : ""}
+    ${permisos.configuracion?.leer ? `<li><a href="configuracion.html" id="nav-configuracion"><i class="fas fa-sliders-h left"></i> Configuración</a></li>` : ""}
+    ${permisos.reportes?.exportar ? `<li><a href="metricas.html" id="nav-metricas"><i class="fas fa-chart-bar left"></i> Métricas</a></li>` : ""}
+    <li class="divider"></li>
+    <li><a href="#" id="menu-logout"><i class="fas fa-sign-out-alt left"></i> Cerrar sesión</a></li>
+  `;
+  document.body.appendChild(dropdown);
+
+  M.Dropdown.init(document.querySelectorAll('.dropdown-trigger'), {
+    constrainWidth: false,
+    coverTrigger: false,
+    alignment: 'right'
+  });
+
+  asignarLogout(["menu-logout"]);
 }
 
 /* ══════════════════════════════════════

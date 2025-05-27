@@ -1,19 +1,16 @@
 <!DOCTYPE html>
 <html lang="es-MX">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Crear Cuenta | TianguiStore</title>
 
-  <!-- MaterializeCSS -->
+  <!-- Estilos -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet" />
-  <!-- FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <!-- Material Icons -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-  <!-- Animate.css -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet" />
-  <!-- Estilos personalizados -->
   <link rel="stylesheet" href="estilo/main.css" />
 </head>
 
@@ -23,13 +20,14 @@
   <main class="container">
     <div class="card-panel glass-card z-depth-5 animate__animated animate__fadeIn">
       <div class="card-content white-text">
-        <h4 class="center-align">
-          <i class="fas fa-user-plus accent-icon"></i> Crear una Cuenta
-        </h4>
+        <h4 class="center-align"><i class="fas fa-user-plus accent-icon"></i> Crear una Cuenta</h4>
 
         <form id="registroForm" novalidate autocomplete="on">
 
-          <!-- Selector visible de tipo de cuenta -->
+          <!-- 🟡 Hidden para compatibilidad -->
+          <input type="hidden" id="tipoCuenta" name="tipoCuenta" value="cliente" />
+
+          <!-- Tipo de cuenta visible -->
           <div class="row">
             <div class="input-field col s12 m6 offset-m3 tooltipped" data-tooltip="Tipo de cuenta que deseas crear">
               <select id="tipoUsuario" name="tipoCuenta" required>
@@ -41,18 +39,18 @@
             </div>
           </div>
 
-          <!-- Email y Contraseña -->
+          <!-- Correo y contraseña -->
           <div class="row">
             <div class="input-field col s12 m6">
               <i class="fas fa-envelope prefix white-text"></i>
-              <input type="email" id="email" name="correo_electronico" required class="validate" autocomplete="email" />
+              <input type="email" id="email" name="correo_electronico" required />
               <label for="email">Correo electrónico *</label>
               <span class="helper-text" data-error="Correo inválido" data-success="Correo válido"></span>
             </div>
 
             <div class="input-field col s12 m6">
               <i class="fas fa-lock prefix white-text"></i>
-              <input type="password" id="password" name="contrasena" required class="validate" autocomplete="new-password" />
+              <input type="password" id="password" name="password" required autocomplete="new-password" />
               <label for="password">Contraseña *</label>
               <span class="toggle-password" data-target="password"><i class="fas fa-eye-slash"></i></span>
               <span class="helper-text">Mínimo 8 caracteres, con al menos una letra y un número.</span>
@@ -65,7 +63,7 @@
             <div class="col s12 m6"></div>
             <div class="input-field col s12 m6">
               <i class="fas fa-lock prefix white-text"></i>
-              <input type="password" id="confirmPassword" name="confirmar_contrasena" required class="validate" autocomplete="new-password" />
+              <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="new-password" />
               <label for="confirmPassword">Confirmar contraseña *</label>
               <span class="toggle-password" data-target="confirmPassword"><i class="fas fa-eye-slash"></i></span>
               <span id="mensajeConfirmacion" class="helper-text">Repite la contraseña.</span>
@@ -141,17 +139,17 @@
             </div>
           </div>
 
-          <!-- Campos dinámicos por tipo de cuenta -->
+          <!-- Campos dinámicos (RFC, CV, etc) -->
           <div id="camposDinamicos"></div>
 
           <!-- Botón de envío -->
           <div class="row center-align" style="margin-top: 2rem">
-            <button type="submit" class="btn-large amber darken-3 waves-effect waves-light tooltipped" data-tooltip="Crear cuenta">
+            <button type="submit" class="btn-large amber darken-3 waves-effect waves-light tooltipped"
+              data-tooltip="Crear cuenta">
               <i class="fas fa-user-plus left"></i> Registrarse
             </button>
           </div>
 
-          <!-- Enlace a login -->
           <div class="section center-align">
             <a href="login.html" class="grey-text text-lighten-3 tooltipped" data-tooltip="¿Ya tienes cuenta?">
               <i class="fas fa-arrow-left left"></i> Ya tengo una cuenta
@@ -169,4 +167,5 @@
   <script src="scripts/registro.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js" defer></script>
 </body>
+
 </html>

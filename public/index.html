@@ -10,22 +10,25 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet" />
   <!-- FontAwesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+  <!-- Animaciones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
   <!-- Estilos personalizados -->
   <link rel="stylesheet" href="estilo/main.css" />
 </head>
 
 <body class="grey darken-4 white-text">
 
-  <!-- NAVBAR dinámico -->
+  <!-- 🔝 NAVBAR dinámico -->
   <header>
     <div id="navbar-container"></div>
   </header>
 
-  <!-- CONTENIDO PRINCIPAL -->
+  <!-- 🌟 CONTENIDO PRINCIPAL -->
   <main class="container">
-    <!-- ENCABEZADO DE BIENVENIDA -->
+    
+    <!-- 🎉 ENCABEZADO DE BIENVENIDA -->
     <section class="section center-align">
-      <div class="card-panel z-depth-3 grey darken-3 hoverable" style="border-radius: 12px;">
+      <div class="card-panel z-depth-4 grey darken-3 hoverable animate__animated animate__fadeInDown" style="border-radius: 16px;">
         <h1 class="white-text" style="font-size: 3rem;">
           <i class="fas fa-store amber-text text-accent-3"></i>
           <strong>TianguiStore</strong>
@@ -36,32 +39,39 @@
       </div>
     </section>
 
-    <!-- PRODUCTOS DESTACADOS -->
+    <!-- 📦 PRODUCTOS DESTACADOS -->
     <section class="section">
       <header class="center-align">
-        <h4 class="white-text">
+        <h4 class="white-text animate__animated animate__fadeInUp">
           <i class="fas fa-box-open amber-text text-accent-2"></i>
           Nuestros Productos
         </h4>
         <p class="grey-text text-lighten-2">Selecciona tus favoritos y agrégalos al carrito</p>
       </header>
 
-      <!-- CONTENEDOR DE TARJETAS CON GRID -->
-      <div id="productos-container" aria-live="polite">
+      <!-- 🧱 GRID DE PRODUCTOS -->
+      <div class="row" id="productos-container" aria-live="polite">
         <!-- Las tarjetas de productos se insertan dinámicamente desde productos.js -->
+      </div>
+
+      <!-- 🔢 PAGINACIÓN -->
+      <div class="center-align">
+        <ul class="pagination" id="paginacion-productos">
+          <!-- Botones de paginación generados desde JS -->
+        </ul>
       </div>
     </section>
   </main>
 
-  <!-- TOASTS (mensajes flotantes) -->
+  <!-- 🔔 TOASTS -->
   <div id="toast-container" class="fixed-action-btn" aria-hidden="true"></div>
 
-  <!-- FOOTER dinámico -->
-  <footer>
+  <!-- 📥 FOOTER dinámico -->
+  <footer class="page-footer grey darken-3">
     <div id="footer-container"></div>
   </footer>
 
-  <!-- SCRIPTS DEL SISTEMA -->
+  <!-- 📜 SCRIPTS DEL SISTEMA -->
   <script src="scripts/loadComponent.js" defer></script>
   <script src="scripts/productos.js" defer></script>
   <script src="scripts/carrito.js" defer></script>

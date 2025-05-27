@@ -1,48 +1,41 @@
-<!-- 📁 navbar.html - Navegación principal TianguiStore -->
 <nav class="nav-extended glass-navbar z-depth-2">
-  <div class="nav-wrapper container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+  <div class="nav-wrapper container" style="display: flex; justify-content: space-between; align-items: center;">
 
-    <!-- 🔷 Logo y nombre a la izquierda -->
-    <a href="index.html" class="brand-logo" style="display: flex; align-items: center; gap: 0.5rem;">
-      <img src="./imagenes/logo.jpeg" alt="Logo TianguiStore" class="circle" style="width: 36px; height: 36px;" />
-      <span class="white-text" style="font-weight: 600; font-size: 1rem;">TianguiStore</span>
-    </a>
+    <!-- 🔷 Logo -->
+    <div style="display: flex; align-items: center;">
+      <a href="index.html" style="display: flex; align-items: center; text-decoration: none;">
+        <img src="./imagenes/logo.jpeg" alt="Logo TianguiStore" class="circle" style="width: 36px; height: 36px; margin-right: 8px;" />
+        <span style="font-weight: 600; font-size: 1.1rem; color: #FAFAFA;">TianguiStore</span>
+      </a>
+    </div>
 
-    <!-- 🍔 Hamburguesa móvil -->
-    <a href="#" data-target="sidenav-mobile" class="sidenav-trigger right"><i class="fas fa-bars white-text"></i></a>
-
-    <!-- 📁 Menú principal centrado -->
-    <ul class="hide-on-med-and-down" style="display: flex; justify-content: center; align-items: flex-end; flex-grow: 1; gap: 2rem;">
-      <li><a href="index.html" class="center-align white-text"><i class="fas fa-home fa-lg"></i><br>Inicio</a></li>
-      <li><a href="productos.html" class="center-align white-text"><i class="fas fa-box-open fa-lg"></i><br>Productos</a></li>
-      <li><a href="categorias.html" class="center-align white-text"><i class="fas fa-tags fa-lg"></i><br>Categorías</a></li>
-      <li><a href="carrito.html" class="center-align white-text"><i class="fas fa-shopping-cart fa-lg"></i><br>Carrito (<span id="contador-carrito">0</span>)</a></li>
-
-      <!-- 🔐 Menús para usuarios autenticados -->
-      <li id="nav-pedidos" style="display: none;"><a href="misPedidos.html" class="center-align white-text"><i class="fas fa-receipt fa-lg"></i><br>Pedidos</a></li>
-      <li id="nav-configuracion" style="display: none;"><a href="#" class="center-align white-text"><i class="fas fa-cog fa-lg"></i><br>Configuración</a></li>
-      <li id="nav-metricas" style="display: none;"><a href="#" class="center-align white-text"><i class="fas fa-chart-line fa-lg"></i><br>Métricas</a></li>
-      <li id="nav-panel" style="display: none;"><a href="#" class="center-align white-text"><i class="fas fa-tools fa-lg"></i><br>Admin</a></li>
-
-      <!-- 🔓 Menús para no autenticados -->
-      <li id="nav-login" style="display: none;"><a href="login.html" class="center-align white-text"><i class="fas fa-sign-in-alt fa-lg"></i><br>Ingresar</a></li>
-      <li id="nav-registro" style="display: none;"><a href="registro.html" class="center-align white-text"><i class="fas fa-user-plus fa-lg"></i><br>Registro</a></li>
-    </ul>
-
-    <!-- 👤 Dropdown cuenta -->
-    <ul id="cuentaDropdown" class="dropdown-content glass-dropdown z-depth-2">
-      <li><a href="cuenta.html"><i class="fas fa-user-edit left"></i> Perfil</a></li>
-      <li><a href="#" id="cerrarSesion"><i class="fas fa-sign-out-alt left"></i> Cerrar sesión</a></li>
-    </ul>
-
-    <!-- Avatar a la derecha (si logueado) -->
-    <ul class="right hide-on-med-and-down" style="margin-right: 1rem;">
-      <li id="nav-cuenta" style="display: none;">
-        <a class="dropdown-trigger center-align white-text" href="#!" data-target="cuentaDropdown" style="display: flex; flex-direction: column; align-items: center;">
-          <img src="./imagenes/logo.jpeg" class="circle" alt="Avatar" style="width: 32px; height: 32px;" />
-          <span id="usuario-info" style="margin-top: 4px;">Usuario</span>
+    <!-- 📁 Menú principal -->
+    <ul class="hide-on-med-and-down" style="display: flex; gap: 1.6rem; margin: 0; align-items: center;">
+      <li><a href="ofertas.html"><i class="fas fa-tags left"></i> Ofertas</a></li>
+      <li>
+        <a class="dropdown-trigger" href="#!" data-target="dropdown-explorar">
+          <i class="fas fa-th-large left"></i> Explorar <i class="fas fa-caret-down right"></i>
         </a>
       </li>
+      <li><a href="blog.html"><i class="fas fa-newspaper left"></i> Blog</a></li>
+      <li><a href="soporte.html"><i class="fas fa-life-ring left"></i> Soporte</a></li>
+      <li><a href="nosotros.html"><i class="fas fa-users left"></i> Nosotros</a></li>
+      <li><a href="contacto.html"><i class="fas fa-envelope left"></i> Contacto</a></li>
+    </ul>
+
+    <!-- 👤 Usuario / Carrito -->
+    <ul class="right hide-on-med-and-down" style="display: flex; gap: 1.4rem; align-items: center;" id="menu-usuario">
+      <li><a href="carrito.html"><i class="fas fa-shopping-cart"></i></a></li>
+      <!-- Aquí se inyectará el menú login/registro/perfil vía JS -->
     </ul>
   </div>
 </nav>
+
+<!-- 🔽 Dropdown de subcategorías -->
+<ul id="dropdown-explorar" class="dropdown-content" style="z-index: 9999;">
+  <li><a href="categorias/electronica.html"><i class="fas fa-microchip left"></i> Electrónica</a></li>
+  <li><a href="categorias/moda.html"><i class="fas fa-tshirt left"></i> Moda</a></li>
+  <li><a href="categorias/hogar.html"><i class="fas fa-couch left"></i> Hogar</a></li>
+  <li><a href="categorias/libros.html"><i class="fas fa-book left"></i> Libros</a></li>
+  <li><a href="categorias/artesanias.html"><i class="fas fa-hand-sparkles left"></i> Artesanías</a></li>
+</ul>

@@ -1,25 +1,13 @@
-/**
- * 📁 MIDDLEWARE: sanitizeAndValidateMiddleware.js
- * 🧼 Middleware universal de sanitización y validación de entradas HTTP.
- *
- * 🎯 Objetivos:
- *   - Prevenir XSS, inyecciones y datos corruptos desde el frontend.
- *   - Validar formato, tipo y longitud de campos según reglas predefinidas.
- *   - Registrar errores de validación en auditoría para trazabilidad.
- *
- * ✅ Compatible con:
- *   - Formularios de usuarios, productos, filtros, configuraciones, etc.
- *   - body, query y params en rutas Express.
- */
-
 const validator = require("validator");
-const db = require("../db/connection"); // 🔗 Conexión para auditoría
+const db = require("../db/connection");
 
-// 📋 Lista de campos permitidos con validaciones por tipo
+// 📋 Campos permitidos y reglas por tipo
 const camposPermitidos = {
-  // 👤 Registro de usuarios
   correo_electronico: { tipo: "string", max: 120, validar: "isEmail" },
-  contrasena: { tipo: "string", max: 100, validar: "isStrongPassword" },
+  contrasena: {
+    tipo: "string", max: 100,
+    validar: "isStrongPassword"
+  },
   confirmar_contrasena: { tipo: "string", max: 100 },
   nombre: { tipo: "string", max: 100 },
   apellido_paterno: { tipo: "string", max: 100 },
@@ -33,9 +21,12 @@ const camposPermitidos = {
   cv_url: { tipo: "string", validar: "isURL", max: 255 },
   portafolio_url: { tipo: "string", validar: "isURL", max: 255 },
   tipo_cuenta: { tipo: "string", max: 20 },
-  origen_reclutamiento: { tipo: "string", max: 30 },
+  origen_reclutamiento: {
+    tipo: "string", max: 30, validar: "enum",
+    opciones: ["redes_sociales", "google", "videos", "eventos", "recomendacion", "otro"]
+  },
 
-  // 🛍️ Productos y catálogo
+  // 🛍️ Productos
   nombre_producto: { tipo: "string", max: 100 },
   descripcion: { tipo: "string", max: 500 },
   precio: { tipo: "float", validar: "isFloat", opciones: { min: 0 } },
@@ -50,7 +41,7 @@ const camposPermitidos = {
 };
 
 /**
- * 🧽 Sanitiza y valida un objeto según `camposPermitidos`
+ * 🧽 Sanitización y validación
  */
 function sanitizarYValidar(obj) {
   const errores = [];
@@ -76,16 +67,25 @@ function sanitizarYValidar(obj) {
         if (config.validar === "isEmail" && !validator.isEmail(limpio)) {
           errores.push(`El campo '${campo}' debe ser un correo electrónico válido.`);
         }
-        if (config.validar === "isStrongPassword" && !validator.isStrongPassword(limpio, {
-          minLength: 8, minUppercase: 1, minNumbers: 1, minSymbols: 0
-        })) {
+
+        if (config.validar === "isStrongPassword" &&
+            !validator.isStrongPassword(limpio, {
+              minLength: 8, minUppercase: 1, minNumbers: 1, minSymbols: 0
+            })) {
           errores.push(`El campo '${campo}' debe contener al menos 8 caracteres, una mayúscula y un número.`);
         }
+
         if (config.validar === "isURL" && !validator.isURL(limpio)) {
           errores.push(`El campo '${campo}' contiene una URL inválida.`);
         }
+
         if (config.validar === "isDate" && !validator.isDate(limpio)) {
           errores.push(`El campo '${campo}' debe tener el formato de fecha YYYY-MM-DD.`);
+        }
+
+        if (config.validar === "enum" &&
+            (!config.opciones || !config.opciones.includes(limpio))) {
+          errores.push(`El campo '${campo}' contiene un valor no permitido.`);
         }
 
         obj[campo] = limpio;
@@ -124,7 +124,7 @@ function sanitizarYValidar(obj) {
       }
 
     } catch (err) {
-      errores.push(`Error inesperado al procesar '${campo}'.`);
+      errores.push(`Error inesperado al procesar '${campo}': ${err.message}`);
     }
   }
 
@@ -132,13 +132,13 @@ function sanitizarYValidar(obj) {
 }
 
 /**
- * 📝 Guarda errores de validación en auditoría (si aplica)
+ * 📝 Auditoría de errores
  */
 async function registrarErrorAuditoria({ req, errores, sqlstate = "VAL001", errno = 1048 }) {
   const sql = `
     INSERT INTO auditoria_errores (
       modulo, procedimiento, usuario_id,
-      datos_entrada, sqlstate, mysql_errno, mensaje
+      datos_entrada, \`sqlstate\`, mysql_errno, mensaje
     ) VALUES (?, ?, ?, ?, ?, ?, ?)
   `;
 

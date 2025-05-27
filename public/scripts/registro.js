@@ -1,23 +1,23 @@
 /**
  * 📦 registro.js
- * Registro elegante, accesible y dinámico. Soporte completo para MaterializeCSS.
- * Autor: I.S.C. Erick Renato Vega Ceron | Versión unificada y mejorada - Mayo 2025
+ * Registro elegante, accesible y robusto para TianguiStore.
+ * Valida campos, políticas de contraseña, origen de reclutamiento y gestiona errores.
+ * Autor: I.S.C. Erick Renato Vega Ceron — Versión Final Mayo 2025
  */
+
 (() => {
   const $ = s => document.querySelector(s);
   const $$ = s => Array.from(document.querySelectorAll(s));
   const showToast = (msg, cls = 'red darken-2') =>
     M.toast({ html: msg, classes: `rounded ${cls}` });
 
+  // === VALIDADORES ========================================================
   const validators = {
-    nombre: { fn: v => v.length > 0, err: '⚠️ El nombre es obligatorio.' },
-    email: {
-      fn: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
-      err: '⚠️ Correo electrónico inválido.'
-    },
+    nombre: { fn: v => v?.trim().length > 0, err: '⚠️ El nombre es obligatorio.' },
+    email: { fn: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), err: '⚠️ Correo electrónico inválido.' },
     password: {
-      fn: v => /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(v),
-      err: '⚠️ La contraseña debe tener al menos 8 caracteres, una letra y un número.'
+      fn: v => /^(?=.*[A-Z])(?=.*\d).{8,}$/.test(v),
+      err: '⚠️ La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.'
     },
     confirmPassword: {
       fn: (v, all) => v === all.password,
@@ -28,12 +28,12 @@
       err: '⚠️ Selecciona un tipo de cuenta válido.'
     },
     como_conociste: {
-      fn: v => !!v,
+      fn: v => ["redes_sociales", "google", "videos", "eventos", "recomendacion", "otro"].includes(v),
       err: '⚠️ Selecciona cómo conociste TianguiStore.'
     },
     otro_como_conociste: {
       fn: (v, all) => all.como_conociste !== 'otro' || (v && v.length >= 2),
-      err: '⚠️ Especifica cómo conociste TianguiStore si elegiste “Otro”.'
+      err: '⚠️ Especifica cómo conociste TianguiStore si seleccionaste “Otro”.'
     },
     foto_perfil_url: urlOpt('foto de perfil'),
     cv_url: urlOpt('CV'),
@@ -48,6 +48,7 @@
     };
   }
 
+  // === CAMPOS DINÁMICOS ===================================================
   const dynamicFields = {
     vendedor: `
       <div class="row animate__animated animate__fadeInUp">
@@ -82,22 +83,34 @@
       </div>`
   };
 
-  function renderDynamic(tipo) {
-    $('#camposDinamicos').innerHTML = dynamicFields[tipo] || '';
-    M.updateTextFields();
-    M.FormSelect.init($$('select'));
+  function renderDynamicFields(tipo) {
+    const cont = $('#camposDinamicos');
+    if (cont) {
+      cont.innerHTML = dynamicFields[tipo] || '';
+      M.updateTextFields();
+      M.FormSelect.init($$('select'));
+    }
   }
 
-  function toggleOtro() {
-    const val = $('#como_conociste')?.value;
-    $('#campoOtroConociste')?.style.setProperty('display', val === 'otro' ? 'block' : 'none');
+  function toggleCampoOtro() {
+    const otro = $('#campoOtroConociste');
+    const select = $('#como_conociste');
+    if (otro && select) {
+      otro.style.display = select.value === 'otro' ? 'block' : 'none';
+    }
   }
 
   function collectData() {
     const data = {};
     $$('#registroForm [name]').forEach(el => {
-      data[el.name] = el.value.trim() || null;
+      data[el.name] = el.value?.trim() || null;
     });
+
+    // Normalizar origen_reclutamiento
+    if (data.como_conociste) {
+      data.como_conociste = data.como_conociste.toLowerCase().replace(/\s+/g, '_');
+    }
+
     return data;
   }
 
@@ -114,84 +127,102 @@
 
   function validateAll(data) {
     const errors = [];
-    for (const [key, rule] of Object.entries(validators)) {
-      const valid = rule.fn(data[key], data);
-      applyValidation(key, valid);
-      if (!valid) errors.push(rule.err);
+    for (const [key, val] of Object.entries(validators)) {
+      const ok = val.fn(data[key], data);
+      applyValidation(key, ok);
+      if (!ok) errors.push(val.err);
     }
     return errors;
   }
 
+  // === INIT ===============================================================
   document.addEventListener('DOMContentLoaded', () => {
-    M.FormSelect.init($$('select'));
-    M.updateTextFields();
+    try {
+      M.FormSelect.init($$('select'));
+      M.updateTextFields();
 
-    const tipoUsuario = $('#tipoUsuario');
-    const tipoOculto = $('#tipoCuenta');
-    const initTipo = localStorage.getItem('tipoCuentaSeleccionado') || tipoUsuario.value;
-    tipoUsuario.value = initTipo;
-    tipoOculto.value = initTipo;
-    M.FormSelect.init(tipoUsuario);
-    renderDynamic(initTipo);
+      const tipoUsuario = $('#tipoUsuario');
+      const tipoOculto = $('#tipoCuenta');
+      const tipoInicial = localStorage.getItem('tipoCuentaSeleccionado') || tipoUsuario?.value || 'cliente';
 
-    tipoUsuario.addEventListener('change', () => {
-      const tipo = tipoUsuario.value;
-      tipoOculto.value = tipo;
-      localStorage.setItem('tipoCuentaSeleccionado', tipo);
-      renderDynamic(tipo);
-    });
+      if (tipoUsuario && tipoOculto) {
+        tipoUsuario.value = tipoInicial;
+        tipoOculto.value = tipoInicial;
+        M.FormSelect.init(tipoUsuario);
+        renderDynamicFields(tipoInicial);
 
-    $('#como_conociste')?.addEventListener('change', toggleOtro);
-    toggleOtro();
-
-    document.body.addEventListener('click', e => {
-      const btn = e.target.closest('.toggle-password');
-      if (!btn) return;
-      const input = document.getElementById(btn.dataset.target);
-      const icon = btn.querySelector('i');
-      if (!input || !icon) return;
-      const show = input.type === 'password';
-      input.type = show ? 'text' : 'password';
-      icon.classList.toggle('fa-eye', show);
-      icon.classList.toggle('fa-eye-slash', !show);
-    });
-
-    $('#password')?.addEventListener('input', () => {
-      const val = $('#password').value;
-      const fuerza = $('#fuerzaPassword');
-      let nivel = { msg: 'Seguridad: Débil', cls: 'red-text', icon: 'cancel' };
-      if (val.length >= 12 && /[A-Z]/.test(val) && /\d/.test(val) && /[!@#$%^&*]/.test(val)) {
-        nivel = { msg: 'Seguridad: Fuerte', cls: 'green-text', icon: 'check_circle' };
-      } else if (val.length >= 8 && /[A-Za-z]/.test(val) && /\d/.test(val)) {
-        nivel = { msg: 'Seguridad: Aceptable', cls: 'amber-text', icon: 'priority_high' };
+        tipoUsuario.addEventListener('change', () => {
+          const tipo = tipoUsuario.value;
+          tipoOculto.value = tipo;
+          localStorage.setItem('tipoCuentaSeleccionado', tipo);
+          renderDynamicFields(tipo);
+        });
       }
-      fuerza.innerHTML = `<i class="material-icons ${nivel.cls}">${nivel.icon}</i> ${nivel.msg}`;
-      fuerza.className = `helper-text ${nivel.cls}`;
-    });
 
-    $('#confirmPassword')?.addEventListener('input', () => {
-      const match = $('#password').value === $('#confirmPassword').value;
-      const mensaje = $('#mensajeConfirmacion');
-      mensaje.innerHTML = match
-        ? '<i class="material-icons green-text">check_circle</i> Coincide'
-        : '<i class="material-icons red-text">cancel</i> No coincide';
-      mensaje.className = `helper-text ${match ? 'green-text' : 'red-text'}`;
-      $('#confirmPassword').classList.toggle('valid', match);
-      $('#confirmPassword').classList.toggle('invalid', !match);
-    });
+      $('#como_conociste')?.addEventListener('change', toggleCampoOtro);
+      toggleCampoOtro();
+
+      document.body.addEventListener('click', e => {
+        const btn = e.target.closest('.toggle-password');
+        if (!btn) return;
+        const input = document.getElementById(btn.dataset.target);
+        const icon = btn.querySelector('i');
+        if (!input || !icon) return;
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        icon.classList.toggle('fa-eye', show);
+        icon.classList.toggle('fa-eye-slash', !show);
+      });
+
+      $('#password')?.addEventListener('input', () => {
+        const val = $('#password').value;
+        const fuerza = $('#fuerzaPassword');
+        const input = $('#password');
+
+        let nivel = { msg: 'Seguridad: Débil', cls: 'red-text', icon: 'cancel', valid: false };
+        if (val.length >= 12 && /[A-Z]/.test(val) && /\d/.test(val) && /[!@#$%^&*]/.test(val)) {
+          nivel = { msg: 'Seguridad: Fuerte', cls: 'green-text', icon: 'check_circle', valid: true };
+        } else if (val.length >= 8 && /[A-Za-z]/.test(val) && /\d/.test(val) && /[A-Z]/.test(val)) {
+          nivel = { msg: 'Seguridad: Aceptable', cls: 'amber-text', icon: 'priority_high', valid: true };
+        }
+
+        fuerza.innerHTML = `<i class="material-icons ${nivel.cls}">${nivel.icon}</i> ${nivel.msg}`;
+        fuerza.className = `helper-text ${nivel.cls}`;
+        input.classList.toggle('valid', nivel.valid);
+        input.classList.toggle('invalid', !nivel.valid);
+      });
+
+      $('#confirmPassword')?.addEventListener('input', () => {
+        const pass = $('#password').value;
+        const confirm = $('#confirmPassword').value;
+        const match = pass === confirm && $('#password').classList.contains('valid');
+        const mensaje = $('#mensajeConfirmacion');
+        mensaje.innerHTML = match
+          ? '<i class="material-icons green-text">check_circle</i> Coincide'
+          : '<i class="material-icons red-text">cancel</i> No coincide';
+        mensaje.className = `helper-text ${match ? 'green-text' : 'red-text'}`;
+        $('#confirmPassword').classList.toggle('valid', match);
+        $('#confirmPassword').classList.toggle('invalid', !match);
+      });
+    } catch (err) {
+      console.error('❌ Error al inicializar:', err);
+      showToast('Error al preparar el formulario.', 'red darken-4');
+    }
   });
 
+  // === SUBMIT =============================================================
   document.addEventListener('submit', async e => {
     if (e.target.id !== 'registroForm') return;
     e.preventDefault();
     clearValidation();
-    const data = collectData();
-    const errores = validateAll(data);
-    if (errores.length) return errores.forEach(showToast);
 
     try {
+      const data = collectData();
+      const errores = validateAll(data);
+      if (errores.length) return errores.forEach(showToast);
+
       const payload = {
-        correo_electronico: data.email,
+        correo_electronico: data.correo_electronico,
         contrasena: data.password,
         confirmar_contrasena: data.confirmPassword,
         tipo_cuenta: data.tipoCuenta,
@@ -216,12 +247,15 @@
         body: JSON.stringify(payload)
       });
 
-      const out = await res.json();
-      if (!res.ok) throw new Error(out.message || 'Error en registro');
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message || 'Error en registro');
+
       showToast('✅ Registro exitoso. Redirigiendo...', 'green darken-2');
-      setTimeout(() => location.href = 'login.html', 1800);
+      setTimeout(() => location.href = 'login.html', 2000);
+
     } catch (err) {
-      showToast(err.message || '⚠️ Error inesperado', 'red darken-3');
+      console.error('❌ Error en envío:', err);
+      showToast(err.message || 'Error inesperado en registro.', 'red darken-3');
     }
   });
 })();
