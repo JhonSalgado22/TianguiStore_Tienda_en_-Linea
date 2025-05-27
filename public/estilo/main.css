@@ -1,8 +1,23 @@
-/* =======================================================
-   🎨 TianguiStore - Estilo Oscuro Mexica Glassmorphism
-   ======================================================= */
-/* === 🎨 PALETA MEXICA OSCURA === */
-/* === BASE === */
+/* ============================================================================
+   🎨 TianguiStore - Estilo Oscuro Mexica Glassmorphism (Variables extendidas)
+   Paleta visual inspirada en el diseño mexica con enfoque moderno y oscuro.
+   Este bloque define todas las variables base utilizadas en los componentes.
+============================================================================ */
+/* 🌑 Colores de fondo principales */
+/* 🌗 Colores de texto */
+/* 💎 Colores de acento */
+/* 🧊 Estilo Glassmorphism */
+/* 📐 Bordes y radios */
+/* 🌀 Transiciones y movimiento */
+/* 🧱 Sombra y profundidad */
+/* 🎨 Colores utilitarios adicionales */
+/* 📏 Breakpoints para diseño responsive */
+/* 🎭 Z-index base para capas */
+/* ============================================================================
+   🧱 BASE - Estilo base para todo el documento HTML
+   Aplica tipografía, colores de fondo, estructura global y animaciones suaves
+============================================================================ */
+/* 🌌 Estilo general del cuerpo */
 body {
   background-color: #081c1b;
   background-image: url("../imagenes/patron_dark.png");
@@ -15,14 +30,23 @@ body {
   padding: 0;
   line-height: 1.6;
   animation: fadeIn 0.6s ease-in-out;
+  scroll-behavior: smooth;
+  font-size: 16px;
 }
+/* 🔗 Enlaces */
 a {
   color: #00d9f4;
-  transition: color 0.3s;
+  text-decoration: none;
+  transition: color 0.3s ease-in-out;
 }
 a:hover {
   color: #00acc1;
 }
+a:focus {
+  outline: 2px dashed rgba(0, 172, 193, 0.6);
+  outline-offset: 2px;
+}
+/* 🧾 Títulos jerárquicos */
 h1,
 h2,
 h3,
@@ -31,25 +55,60 @@ h5,
 h6 {
   color: #d4a03f;
   font-weight: 600;
+  line-height: 1.25;
+  margin-top: 1.5rem;
   margin-bottom: 1rem;
 }
+h1 small,
+h2 small,
+h3 small,
+h4 small,
+h5 small,
+h6 small {
+  color: rgba(176, 176, 176, 0.7);
+  font-weight: 400;
+  font-size: 75%;
+}
+/* 🧾 Textos secundarios */
 p,
 span,
 label {
-  color: #cccccc;
+  color: #b0b0b0;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
 }
-/* === NAVBAR === */
+/* 🧭 Elementos de scroll personalizados */
+::-webkit-scrollbar {
+  width: 10px;
+  background-color: rgba(8, 28, 27, 0.6);
+}
+::-webkit-scrollbar-thumb {
+  background: #00acc1;
+  border-radius: 6px;
+  transition: background-color 0.3s;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00d9f4;
+}
+/* ============================================================================
+   🔝 NAVBAR - Menú superior principal del sitio
+   Diseño glassmorphism oscuro con íconos, accesibilidad y animación sutil.
+============================================================================ */
 nav {
   background-color: rgba(14, 34, 33, 0.75) !important;
-  backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  /* 📦 Dropdown (submenús desplegables) */
 }
 nav .nav-wrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  /* 🪙 Logo del sitio (imagen + texto) */
+  /* 📂 Menú principal (horizontal) */
 }
 nav .nav-wrapper .brand-logo {
   display: flex !important;
@@ -61,6 +120,7 @@ nav .nav-wrapper .brand-logo img {
   height: 36px;
   margin-right: 0.6rem;
   border-radius: 50%;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
 }
 nav .nav-wrapper .brand-logo span {
   font-size: 1.2rem;
@@ -72,6 +132,7 @@ nav .nav-wrapper ul {
   gap: 1.5rem;
   margin: 0;
   padding: 0;
+  list-style: none;
 }
 nav .nav-wrapper ul li {
   display: flex;
@@ -83,7 +144,7 @@ nav .nav-wrapper ul li a {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  transition: color 0.3s;
+  transition: color 0.3s ease-in-out;
 }
 nav .nav-wrapper ul li a i {
   font-size: 1rem;
@@ -93,6 +154,10 @@ nav .nav-wrapper ul li a i {
 nav .nav-wrapper ul li a:hover {
   color: #00acc1 !important;
   background-color: transparent;
+}
+nav .nav-wrapper ul li a:focus {
+  outline: 2px dashed rgba(0, 172, 193, 0.6);
+  outline-offset: 4px;
 }
 nav .dropdown-content {
   background-color: rgba(20, 48, 47, 0.75);
@@ -104,6 +169,7 @@ nav .dropdown-content {
   margin-top: 0.6rem !important;
   min-width: 200px;
   overflow: hidden;
+  animation: fadeIn 0.4s ease-in-out;
 }
 nav .dropdown-content li > a {
   display: flex;
@@ -121,67 +187,132 @@ nav .dropdown-content li > a i {
 nav .dropdown-content li > a:hover {
   background-color: rgba(0, 172, 193, 0.12);
 }
-/* === SIDENAV (Mobile) === */
+nav .dropdown-content li > a:focus {
+  outline: 2px dashed rgba(0, 172, 193, 0.6);
+  outline-offset: 4px;
+}
+/* ============================================================================
+   📱 SIDENAV (Mobile) - Menú lateral desplegable para pantallas pequeñas
+   Aplica fondo translúcido, accesibilidad visual y efecto glassmorphism.
+============================================================================ */
 .sidenav {
-  background-color: rgba(8, 28, 27, 0.9);
+  background-color: rgba(8, 28, 27, 0.92);
   color: #e0e0e0;
+  padding-top: 1rem;
+}
+.sidenav li {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 .sidenav li > a {
   color: #e0e0e0 !important;
   font-weight: 500;
+  padding: 0.9rem 1.4rem;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s;
 }
 .sidenav li > a i {
   margin-right: 0.6rem;
   width: 1.2rem;
   text-align: center;
+  font-size: 1.1rem;
 }
 .sidenav li > a:hover {
   background-color: rgba(0, 172, 193, 0.12);
 }
+.sidenav li > a:focus {
+  outline: 2px dashed rgba(0, 172, 193, 0.6);
+  outline-offset: 4px;
+}
+/* 🔻 Encabezados desplegables (collapsibles) */
 .collapsible-header {
   color: #e0e0e0 !important;
+  font-weight: 600;
+  font-size: 1.05rem;
+  background-color: transparent;
+  padding: 0.9rem 1.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  transition: background-color 0.3s;
 }
-/* === TARJETAS DE PRODUCTO === */
+.collapsible-header:hover {
+  background-color: rgba(0, 172, 193, 0.1);
+}
+.collapsible-header i {
+  margin-right: 0.8rem;
+  font-size: 1.1rem;
+}
+/* ============================================================================
+   🧊 TARJETAS DE PRODUCTO - Diseño Glassmorphism extendido
+   Mejora visual y responsiva de las tarjetas con fondo decorativo y sombras suaves
+============================================================================ */
 .product-card,
 .glass-card {
-  background: rgba(14, 34, 33, 0.96);
+  position: relative;
+  background: linear-gradient(to bottom right, rgba(14, 34, 33, 0.88), rgba(7, 16, 15, 0.9)), url("../imagenes/patron_producto.png") repeat;
+  background-size: cover;
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 0.75rem;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  transition: transform 0.3s;
+  transition: transform 0.3s, box-shadow 0.3s;
   overflow: hidden;
-  position: relative;
+  animation: fadeInCard 0.5s ease-in-out;
+  /* 📷 Imagen destacada del producto */
+  /* 🧾 Contenido textual del producto */
+  /* 💰 Precio y stock en distribución horizontal */
+  /* 💠 Animación de entrada */
 }
 .product-card:hover,
 .glass-card:hover {
   transform: scale(1.02);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+.product-card .card-image,
+.glass-card .card-image {
+  position: relative;
+  overflow: hidden;
 }
 .product-card .card-image img,
 .glass-card .card-image img {
-  transition: transform 0.3s ease-in-out;
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
   border-bottom: 1px solid rgba(0, 172, 193, 0.15);
+  transition: transform 0.3s ease, filter 0.3s ease;
+  filter: brightness(0.98);
 }
-.product-card:hover .card-image img,
-.glass-card:hover .card-image img {
+.product-card .card-image:hover img,
+.glass-card .card-image:hover img {
   transform: scale(1.05);
+  filter: brightness(1);
 }
 .product-card .card-content,
 .glass-card .card-content {
   padding: 1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 .product-card .product-title,
 .glass-card .product-title {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 600;
-  margin-bottom: 0.4rem;
+  margin: 0;
   color: #d4a03f;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .product-card .product-description,
 .glass-card .product-description {
-  font-size: 0.9rem;
-  line-height: 1.4;
-  color: #cccccc;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #b0b0b0;
+  max-height: 4.4rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .product-card .product-price-stock,
 .glass-card .product-price-stock {
@@ -189,54 +320,153 @@ nav .dropdown-content li > a:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
 }
 .product-card .product-price,
 .glass-card .product-price {
   font-size: 1.1rem;
   font-weight: bold;
   color: #e0e0e0;
+  white-space: nowrap;
 }
 .product-card .product-stock,
 .glass-card .product-stock {
   font-size: 0.85rem;
-  color: #cccccc;
+  color: #b0b0b0;
+  font-style: italic;
 }
-/* === FORMULARIO === */
+@keyframes fadeInCard {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* ============================================================================
+   🧾 TianguiStore - Formulario Glassmorphism Ceremonial
+   Estilo oscuro, accesible y visualmente refinado para inputs y selects.
+============================================================================ */
+/* === Input field contenedor con prefijo e íconos === */
 .input-field {
   position: relative;
+  margin-bottom: 2rem;
 }
 .input-field .prefix {
-  color: #e0e0e0 !important;
+  color: #d4a03f !important;
   opacity: 0.95;
+  font-size: 1.2rem;
+  margin-right: 0.6rem;
   transition: color 0.3s;
-}
-.input-field input,
-.input-field textarea,
-.input-field select {
-  background-color: rgba(0, 0, 0, 0.15);
-  border: none;
-  border-bottom: 1px solid rgba(0, 172, 193, 0.5);
-  color: #e0e0e0;
-  transition: border-bottom 0.3s, box-shadow 0.3s;
-}
-.input-field input:focus,
-.input-field textarea:focus {
-  border-bottom: 2px solid #d4a03f;
-  box-shadow: 0 1px 0 0 #d4a03f;
 }
 .input-field label {
-  color: #cccccc;
-  transition: color 0.3s;
+  color: #d4a03f;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-left: 0.1rem;
+  transition: color 0.3s ease;
+  user-select: none;
 }
 .input-field input:focus + label,
 .input-field textarea:focus + label {
-  color: #d4a03f;
+  color: #00acc1;
 }
 .input-field input[type="date"]::-webkit-calendar-picker-indicator,
 .input-field input[type="time"]::-webkit-calendar-picker-indicator {
   filter: invert(100%);
 }
-/* === TOGGLE-PASSWORD === */
+/* === Inputs y selects integrados === */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="url"],
+input[type="date"],
+textarea,
+.select-wrapper input.select-dropdown {
+  width: 100%;
+  background: rgba(14, 34, 33, 0.3);
+  padding: 0.7rem 0.5rem 0.4rem;
+  border: none;
+  border-bottom: 1.5px solid rgba(212, 160, 63, 0.35);
+  border-radius: 0.75rem;
+  color: #e0e0e0;
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+  transition: border-bottom 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="tel"]::placeholder,
+input[type="url"]::placeholder,
+input[type="date"]::placeholder,
+textarea::placeholder,
+.select-wrapper input.select-dropdown::placeholder {
+  color: rgba(176, 176, 176, 0.4);
+  font-style: italic;
+}
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="date"]:focus,
+textarea:focus,
+.select-wrapper input.select-dropdown:focus {
+  background: rgba(0, 172, 193, 0.08);
+  border-bottom: 2px solid #d4a03f;
+  box-shadow: 0 1px 0 0 #d4a03f;
+  outline: none;
+}
+input[type="text"]:hover:not(:disabled):not(:focus),
+input[type="email"]:hover:not(:disabled):not(:focus),
+input[type="password"]:hover:not(:disabled):not(:focus),
+input[type="tel"]:hover:not(:disabled):not(:focus),
+input[type="url"]:hover:not(:disabled):not(:focus),
+input[type="date"]:hover:not(:disabled):not(:focus),
+textarea:hover:not(:disabled):not(:focus),
+.select-wrapper input.select-dropdown:hover:not(:disabled):not(:focus) {
+  border-bottom: 1.5px solid rgba(0, 172, 193, 0.5);
+}
+input[type="text"]:disabled,
+input[type="email"]:disabled,
+input[type="password"]:disabled,
+input[type="tel"]:disabled,
+input[type="url"]:disabled,
+input[type="date"]:disabled,
+textarea:disabled,
+.select-wrapper input.select-dropdown:disabled {
+  background-color: rgba(14, 34, 33, 0.1);
+  color: rgba(176, 176, 176, 0.5);
+  cursor: not-allowed;
+  border-bottom: 1px dashed rgba(176, 176, 176, 0.25);
+}
+/* === Validaciones visuales === */
+input.valid,
+textarea.valid {
+  border-bottom: 2px solid #6ec071 !important;
+  box-shadow: 0 1px 0 0 #6ec071 !important;
+}
+input.invalid,
+textarea.invalid {
+  border-bottom: 2px solid #f6675d !important;
+  box-shadow: 0 1px 0 0 #f6675d !important;
+}
+/* === Autofill y accesibilidad === */
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  transition: background-color 5000s ease-in-out 0s;
+  -webkit-text-fill-color: #e0e0e0 !important;
+  box-shadow: 0 0 0 1000px rgba(14, 34, 33, 0.2) inset !important;
+  border-bottom: 1px solid rgba(0, 172, 193, 0.4) !important;
+}
+/* === Toggle de contraseña === */
 .toggle-password {
   position: absolute;
   top: 50%;
@@ -244,82 +474,267 @@ nav .dropdown-content li > a:hover {
   transform: translateY(-50%);
   z-index: 2;
   cursor: pointer;
-  color: #e0e0e0;
+  color: #b0b0b0;
   font-size: 1.2rem;
-  -webkit-user-select: none;
+  opacity: 0.7;
+  transition: color 0.3s, transform 0.2s;
+}
+.toggle-password:hover {
+  color: #00acc1;
+  opacity: 1;
+}
+.toggle-password:active {
+  transform: translateY(-50%) scale(0.95);
+}
+/* === Menú desplegable (Materialize Select) === */
+.select-dropdown {
+  background: rgba(8, 28, 27, 0.85) !important;
+  backdrop-filter: blur(16px) saturate(120%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 0.75rem;
+  color: #e0e0e0 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  font-family: 'Roboto', sans-serif;
+  font-size: 1rem;
+  padding: 0.25rem 0;
+  z-index: 1000;
+  overflow: hidden;
+}
+.select-dropdown.dropdown-content {
+  max-height: 300px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #00acc1 transparent;
+}
+.select-dropdown li > span {
+  color: #e0e0e0;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  display: block;
+  border-radius: 0.75rem;
+  transition: background 0.15s, color 0.15s;
+}
+.select-dropdown li:hover > span,
+.select-dropdown li.selected > span {
+  background-color: rgba(0, 172, 193, 0.2) !important;
+  color: white !important;
+}
+.select-wrapper input.select-dropdown:focus {
+  border-bottom: 2px solid #d4a03f !important;
+  box-shadow: 0 1px 0 0 #d4a03f !important;
+  background-color: transparent !important;
+  color: #e0e0e0 !important;
+}
+.select-wrapper input.select-dropdown:focus + label {
+  color: #d4a03f !important;
+}
+.select-dropdown li {
+  -webkit-tap-highlight-color: transparent;
+}
+/* ============================================================================
+   🔒 TOGGLE-PASSWORD - Ícono para mostrar u ocultar contraseña
+   Se ubica dentro del campo de input y ofrece feedback visual e interacción suave
+============================================================================ */
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  transform: translateY(-50%);
+  z-index: 2;
+  cursor: pointer;
+  color: rgba(224, 224, 224, 0.8);
+  font-size: 1.25rem;
   user-select: none;
+  -webkit-user-select: none;
+  transition: color 0.25s ease, opacity 0.3s ease;
 }
-/* === VALIDACIONES === */
-.input-field input.valid {
-  border-bottom: 2px solid #00b300;
-  box-shadow: 0 1px 0 0 #00b300;
+.toggle-password:hover {
+  color: #00acc1;
+  opacity: 1;
 }
-.input-field input.invalid {
-  border-bottom: 2px solid #ff3333;
-  box-shadow: 0 1px 0 0 #ff3333;
+.toggle-password:focus {
+  outline: 2px dashed rgba(0, 172, 193, 0.6);
+  outline-offset: 4px;
 }
-/* === HELPER-TEXT === */
+.toggle-password:active {
+  transform: translateY(-50%) scale(0.95);
+}
+/* ============================================================================
+   ✅ VALIDACIONES - Estados visuales para campos válidos e inválidos
+   Mejora el feedback al usuario con colores contrastantes y transiciones suaves
+============================================================================ */
+/* ✔️ Campo válido (éxito) */
+.input-field input.valid,
+.input-field textarea.valid,
+.input-field select.valid {
+  border-bottom: 2px solid #6ec071;
+  box-shadow: 0 1px 0 0 #6ec071;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.input-field input.valid:focus,
+.input-field textarea.valid:focus,
+.input-field select.valid:focus {
+  border-bottom: 2px solid #5cb860;
+  box-shadow: 0 1px 0 0 #5cb860;
+}
+/* ❌ Campo inválido (error) */
+.input-field input.invalid,
+.input-field textarea.invalid,
+.input-field select.invalid {
+  border-bottom: 2px solid #f77066;
+  box-shadow: 0 1px 0 0 #f77066;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.input-field input.invalid:focus,
+.input-field textarea.invalid:focus,
+.input-field select.invalid:focus {
+  border-bottom: 2px solid #f44336;
+  box-shadow: 0 1px 0 0 #f44336;
+}
+/* ============================================================================
+   🧾 HELPER-TEXT - Mensajes de ayuda o validación debajo de inputs
+   Incluye colores semánticos, íconos y alineación moderna con feedback visual claro
+============================================================================ */
 .helper-text {
   font-size: 0.9rem;
   line-height: 1.4;
   margin-top: 0.5rem;
   display: block;
-  color: #e0e0e0 !important;
+  color: rgba(224, 224, 224, 0.85) !important;
+  font-weight: 400;
+  padding-left: 0.2rem;
+  transition: color 0.3s ease;
+  /* 🔁 Estilo para mensajes con íconos */
+  /* ❌ Error (rojo) */
+  /* ✅ Correcto (verde) */
+  /* ⚠️ Advertencia / Sugerencia (ámbar) */
+  /* 🧩 Ícono embebido dentro del mensaje */
+  /* 📱 Responsividad en dispositivos pequeños */
 }
 .helper-text.red-text,
 .helper-text.green-text,
 .helper-text.amber-text {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.3rem;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+  font-weight: 500;
+  letter-spacing: 0.2px;
 }
 .helper-text.red-text {
-  color: #ff5252 !important;
+  color: #f55a4e !important;
 }
 .helper-text.green-text {
-  color: #69f0ae !important;
+  color: #5cb860 !important;
 }
 .helper-text.amber-text {
-  color: #ffd740 !important;
+  color: #e68900 !important;
 }
 .helper-text .material-icons {
   font-size: 1.1rem;
+  line-height: 1;
   position: relative;
   top: 1px;
+  opacity: 0.85;
 }
-/* === BOTONES === */
+@media screen and (max-width: 480px) {
+  .helper-text {
+    font-size: 0.85rem;
+  }
+  .helper-text .material-icons {
+    font-size: 1rem;
+  }
+}
+/* ============================================================================
+   🔘 BOTONES - Estilo principal para botones grandes (submit) y de acción
+   Estética elegante, acentuada y con interactividad suave. Coherente con el estilo Mexica.
+============================================================================ */
 button[type="submit"].btn-large,
 .btn.btn-agregar {
   background-color: #d4a03f;
   color: #081c1b;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 1.05rem;
+  padding: 0.85rem 1.6rem;
   border-radius: 0.75rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  transition: all 0.3s;
+  transition: all 0.3s ease-in-out;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 button[type="submit"].btn-large:hover,
 .btn.btn-agregar:hover {
-  background-color: #bf8c2b;
-  transform: scale(1.03);
+  background-color: #b78529;
+  transform: scale(1.035);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
 }
-/* === ETIQUETAS DE PRODUCTO (BADGES) === */
+button[type="submit"].btn-large:focus,
+.btn.btn-agregar:focus {
+  outline: 2px dashed rgba(0, 172, 193, 0.6);
+  outline-offset: 4px;
+}
+button[type="submit"].btn-large:active,
+.btn.btn-agregar:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+button[type="submit"].btn-large:disabled,
+.btn.btn-agregar:disabled {
+  background-color: rgba(212, 160, 63, 0.4);
+  color: rgba(8, 28, 27, 0.6);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+button[type="submit"].btn-large i.material-icons,
+.btn.btn-agregar i.material-icons,
+button[type="submit"].btn-large svg,
+.btn.btn-agregar svg {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  vertical-align: middle;
+}
+/* ============================================================================
+   🏷️ ETIQUETAS DE PRODUCTO (BADGES)
+   Distintivos flotantes para destacar estado del producto: nuevo, popular, bajo stock, etc.
+   Estilo visual con glassmorphism, color de fondo semántico y legibilidad optimizada.
+============================================================================ */
 .badge-etiqueta {
   position: absolute;
   top: 10px;
   left: 10px;
+  z-index: 3;
   padding: 4px 10px;
   font-size: 0.75rem;
   font-weight: bold;
   color: #fff;
-  border-radius: 1rem;
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  border-radius: 1.25rem;
+  background-color: rgba(0, 0, 0, 0);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   animation: fadeIn 0.5s ease-in-out;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
+.badge-etiqueta:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+.badge-etiqueta i,
+.badge-etiqueta svg {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+/* 🎯 Badges específicos por tipo de estado */
 .badge-destacado {
   background-color: #00acc1;
 }
@@ -333,7 +748,11 @@ button[type="submit"].btn-large:hover,
   background-color: #ffc107;
   color: #121212;
 }
-/* === ANIMACIONES === */
+/* ============================================================================
+   🎞️ ANIMACIONES - TianguiStore
+   Animaciones modernas y suaves para glassmorphism oscuro profesional.
+============================================================================ */
+/* === ⚡ Aparición básica === */
 @keyframes fadeIn {
   0% {
     opacity: 0;
@@ -342,6 +761,7 @@ button[type="submit"].btn-large:hover,
     opacity: 1;
   }
 }
+/* === ⬇️ Entrada desde arriba (menús, alertas, modales) === */
 @keyframes fadeInDown {
   0% {
     opacity: 0;
@@ -352,6 +772,18 @@ button[type="submit"].btn-large:hover,
     transform: translateY(0);
   }
 }
+/* === ⬆️ Entrada desde abajo (botones flotantes, tarjetas) === */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* === 🔍 Escala suave (entradas visuales como tarjetas) === */
 @keyframes scaleIn {
   0% {
     transform: scale(0.95);
@@ -360,5 +792,48 @@ button[type="submit"].btn-large:hover,
   100% {
     transform: scale(1);
     opacity: 1;
+  }
+}
+/* === 🔁 Fade escalonado para listas (cards en galería o loops) === */
+@keyframes fadeStaggered {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* === 🔄 Rotación continua (spinners) === */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+/* === 💡 Parpadeo pulsante (tooltips, badges dinámicos) === */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+/* === ✨ Fade in + blur (efecto vidrio animado) === */
+@keyframes fadeBlurIn {
+  0% {
+    opacity: 0;
+    filter: blur(4px);
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
   }
 }

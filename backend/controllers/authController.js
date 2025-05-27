@@ -12,7 +12,7 @@ const rolModel = require("../models/rol.model");
 const {
   generarAccessToken,
   generarRefreshToken,
-  verificarRefreshToken
+  verificarRefreshToken,
 } = require("../utils/jwt");
 
 /**
@@ -24,7 +24,7 @@ const {
  * @route POST /auth/registro
  */
 async function registrarUsuario(req, res) {
-  const {
+  let {
     correo_electronico,
     contrasena,
     confirmar_contrasena,
@@ -39,61 +39,87 @@ async function registrarUsuario(req, res) {
     biografia = null,
     cv_url = null,
     portafolio_url = null,
-    origen_reclutamiento = "externo"
+    origen_reclutamiento = "externo",
   } = req.body;
 
-  // 🧾 Validaciones iniciales
-  if (!correo_electronico || !contrasena || !nombre) {
-    return res.status(400).json({
-      message: "Faltan campos obligatorios: correo_electronico, contrasena, nombre."
-    });
-  }
-
-  if (!validator.isEmail(correo_electronico)) {
-    return res.status(400).json({ message: "Correo electrónico inválido." });
-  }
-
-  if (contrasena !== confirmar_contrasena) {
-    return res.status(400).json({ message: "Las contraseñas no coinciden." });
-  }
-
-  if (!validator.isStrongPassword(contrasena, {
-    minLength: 8,
-    minLowercase: 1,
-    minUppercase: 1,
-    minNumbers: 1,
-    minSymbols: 0
-  })) {
-    return res.status(400).json({
-      message: "Contraseña débil. Requiere mínimo 8 caracteres, una mayúscula y un número."
-    });
-  }
-
-  // Validaciones adicionales
-  if (foto_perfil_url && !validator.isURL(foto_perfil_url)) {
-    return res.status(400).json({ message: "URL de foto de perfil inválida." });
-  }
-
-  if (cv_url && !validator.isURL(cv_url)) {
-    return res.status(400).json({ message: "URL de CV inválida." });
-  }
-
-  if (portafolio_url && !validator.isURL(portafolio_url)) {
-    return res.status(400).json({ message: "URL de portafolio inválida." });
-  }
-
-  if (!["externo", "interno", "campaña", "referido", "fidelidad"].includes(origen_reclutamiento)) {
-    return res.status(400).json({ message: "Origen de reclutamiento no válido." });
-  }
-
   try {
+    // 🔄 Mapeo frontend → backend del origen
+    const mapaOrigen = {
+      google: "externo",
+      redes_sociales: "externo",
+      videos: "externo",
+      eventos: "campaña",
+      recomendacion: "referido",
+      otro: "externo",
+    };
+    origen_reclutamiento =
+      mapaOrigen[origen_reclutamiento] || origen_reclutamiento;
+
+    // 🧾 Validaciones
+    if (!correo_electronico || !contrasena || !nombre) {
+      return res.status(400).json({
+        message:
+          "Faltan campos obligatorios: correo_electronico, contrasena o nombre.",
+      });
+    }
+
+    if (!validator.isEmail(correo_electronico)) {
+      return res.status(400).json({ message: "Correo electrónico inválido." });
+    }
+
+    if (contrasena !== confirmar_contrasena) {
+      return res.status(400).json({ message: "Las contraseñas no coinciden." });
+    }
+
+    if (
+      !validator.isStrongPassword(contrasena, {
+        minLength: 8,
+        minLowercase: 1,
+        minUppercase: 1,
+        minNumbers: 1,
+        minSymbols: 0,
+      })
+    ) {
+      return res.status(400).json({
+        message:
+          "Contraseña débil. Requiere al menos 8 caracteres, una mayúscula y un número.",
+      });
+    }
+
+    // 🌐 Validación de URLs opcionales
+    if (foto_perfil_url && !validator.isURL(foto_perfil_url)) {
+      return res
+        .status(400)
+        .json({ message: "URL de foto de perfil inválida." });
+    }
+    if (cv_url && !validator.isURL(cv_url)) {
+      return res.status(400).json({ message: "URL de CV inválida." });
+    }
+    if (portafolio_url && !validator.isURL(portafolio_url)) {
+      return res.status(400).json({ message: "URL de portafolio inválida." });
+    }
+
+    const origenesValidos = [
+      "externo",
+      "campaña",
+      "referido",
+      "fidelidad",
+      "interno",
+    ];
+    if (!origenesValidos.includes(origen_reclutamiento)) {
+      return res
+        .status(400)
+        .json({ message: "Origen de reclutamiento no válido." });
+    }
+
+    // 🔍 Verificación de duplicado
     const yaExiste = await usuarioModel.existeCorreo(correo_electronico);
     if (yaExiste) {
       return res.status(409).json({ message: "El correo ya está registrado." });
     }
 
+    // 🔐 Hash y registro
     const hash = await bcrypt.hash(contrasena, 10);
-
     await usuarioModel.crearUsuario({
       correo_electronico,
       contrasena_hash: hash,
@@ -108,16 +134,19 @@ async function registrarUsuario(req, res) {
       biografia,
       cv_url,
       portafolio_url,
-      origen_reclutamiento
+      origen_reclutamiento,
     });
 
-    return res.status(201).json({ message: "Usuario registrado correctamente." });
+    return res
+      .status(201)
+      .json({ message: "Usuario registrado correctamente." });
   } catch (error) {
     console.error("❌ Error en registrarUsuario:", error);
-    return res.status(500).json({ message: "Error interno al registrar usuario." });
+    return res
+      .status(500)
+      .json({ message: "Error interno al registrar usuario." });
   }
 }
-
 
 /**
  * 🔐 INICIO DE SESIÓN
@@ -127,11 +156,14 @@ async function verificarUsuario(req, res) {
   const { correo_electronico, contrasena } = req.body;
 
   if (!correo_electronico || !contrasena) {
-    return res.status(400).json({ message: "Correo y contraseña son requeridos." });
+    return res
+      .status(400)
+      .json({ message: "Correo y contraseña son requeridos." });
   }
 
   try {
-    const usuario = await usuarioModel.buscarUsuarioPorCorreo(correo_electronico);
+    const usuario =
+      await usuarioModel.buscarUsuarioPorCorreo(correo_electronico);
     if (!usuario) {
       return res.status(401).json({ message: "Credenciales inválidas." });
     }
@@ -143,7 +175,9 @@ async function verificarUsuario(req, res) {
 
     let permisos = {};
     try {
-      const permisosRaw = await rolModel.obtenerPermisosPorRolId(usuario.rol_id);
+      const permisosRaw = await rolModel.obtenerPermisosPorRolId(
+        usuario.rol_id
+      );
       if (typeof permisosRaw === "string") {
         permisos = JSON.parse(permisosRaw || "{}");
       } else if (typeof permisosRaw === "object" && permisosRaw !== null) {
@@ -152,7 +186,11 @@ async function verificarUsuario(req, res) {
         throw new Error("Tipo de permisos inesperado");
       }
     } catch (e) {
-      console.warn("⚠️ Permisos corruptos para rol_id:", usuario.rol_id, e.message);
+      console.warn(
+        "⚠️ Permisos corruptos para rol_id:",
+        usuario.rol_id,
+        e.message
+      );
     }
 
     const payload = {
@@ -160,14 +198,14 @@ async function verificarUsuario(req, res) {
       correo: usuario.correo_electronico,
       nombre: usuario.nombre,
       rol: usuario.rol || "cliente",
-      permisos
+      permisos,
     };
 
     return res.status(200).json({
       message: "Inicio de sesión exitoso.",
       accessToken: generarAccessToken(payload),
       refreshToken: generarRefreshToken({ usuario_id: usuario.usuario_id }),
-      usuario: payload
+      usuario: payload,
     });
   } catch (error) {
     console.error("❌ Error en verificarUsuario:", error);
@@ -208,7 +246,9 @@ async function refrescarToken(req, res) {
 
     let permisos = {};
     try {
-      const permisosRaw = await rolModel.obtenerPermisosPorRolId(usuario.rol_id);
+      const permisosRaw = await rolModel.obtenerPermisosPorRolId(
+        usuario.rol_id
+      );
       if (typeof permisosRaw === "string") {
         permisos = JSON.parse(permisosRaw || "{}");
       } else if (typeof permisosRaw === "object" && permisosRaw !== null) {
@@ -217,7 +257,11 @@ async function refrescarToken(req, res) {
         throw new Error("Tipo de permisos inesperado");
       }
     } catch (e) {
-      console.warn("⚠️ Permisos corruptos para rol_id:", usuario.rol_id, e.message);
+      console.warn(
+        "⚠️ Permisos corruptos para rol_id:",
+        usuario.rol_id,
+        e.message
+      );
     }
 
     const payload = {
@@ -225,13 +269,13 @@ async function refrescarToken(req, res) {
       correo: usuario.correo_electronico,
       nombre: usuario.nombre,
       rol: usuario.rol || "cliente",
-      permisos
+      permisos,
     };
 
     return res.status(200).json({
       message: "Token renovado exitosamente.",
       accessToken: generarAccessToken(payload),
-      usuario: payload
+      usuario: payload,
     });
   } catch (error) {
     console.error("❌ Error en refrescarToken:", error);
@@ -245,7 +289,8 @@ async function refrescarToken(req, res) {
  */
 function cerrarSesion(req, res) {
   return res.status(200).json({
-    message: "Sesión cerrada. El cliente debe eliminar los tokens del almacenamiento local."
+    message:
+      "Sesión cerrada. El cliente debe eliminar los tokens del almacenamiento local.",
   });
 }
 
@@ -254,5 +299,5 @@ module.exports = {
   verificarUsuario,
   obtenerSesion,
   refrescarToken,
-  cerrarSesion
+  cerrarSesion,
 };

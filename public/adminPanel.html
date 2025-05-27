@@ -1,11 +1,10 @@
-<!-- 📁 adminPanel.html - Panel de Administración TianguiStore -->
 <!DOCTYPE html>
 <html lang="es-MX">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Panel de Administración | TianguiStore</title>
-  
+
   <!-- MaterializeCSS -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet" />
   <!-- FontAwesome -->
@@ -14,39 +13,15 @@
   <link rel="stylesheet" href="estilo/main.css" />
 </head>
 
-<body class="grey darken-4 white-text">
+<body class="dark-theme">
 
-  <!-- 🔝 Navbar superior -->
-  <nav class="grey darken-3 z-depth-1">
-    <div class="nav-wrapper container">
-      <a href="index.html" class="brand-logo" style="display: flex; align-items: center;">
-        <i class="fas fa-store"></i>&nbsp;TianguiStore
-      </a>
-      
-      <ul class="right">
-        <li>
-          <a id="toggleThemeBtn" class="tooltipped" data-tooltip="Tema claro/oscuro">
-            <i class="fas fa-moon"></i>
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-trigger" href="#!" data-target="dropdownCuenta">
-            <i class="fas fa-user-circle left"></i><span id="usuario-info">Administrador</span><i class="fas fa-caret-down right"></i>
-          </a>
-        </li>
-      </ul>
-    </div>
-  </nav>
+  <!-- 🔝 Navbar completo -->
+  <div id="navbar-container"></div>
 
-  <!-- 🔽 Menú desplegable cuenta -->
-  <ul id="dropdownCuenta" class="dropdown-content grey darken-4">
-    <li><a href="#" id="menu-logout" class="white-text"><i class="fas fa-sign-out-alt left"></i> Cerrar sesión</a></li>
-  </ul>
-
-  <!-- 🧠 Menú principal como tarjetas -->
+  <!-- 🧠 Panel de Administración -->
   <main class="section" id="seccion-principal">
     <div class="container">
-      <h4 class="center-align">Panel de Administración</h4>
+      <h4 class="center-align amber-text text-accent-3">Panel de Administración</h4>
       <p class="grey-text text-lighten-2 center-align">Selecciona una sección para comenzar</p>
 
       <div class="row">
@@ -97,13 +72,12 @@
     </div>
   </main>
 
-  <!-- 🔻 Footer -->
+  <!-- 🔻 Footer global -->
   <div id="footer-container"></div>
 
   <!-- 📦 Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js" defer></script>
   <script src="scripts/loadComponent.js" defer></script>
   <script type="module" src="scripts/admin/index.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js" defer></script>
-
 </body>
 </html>
