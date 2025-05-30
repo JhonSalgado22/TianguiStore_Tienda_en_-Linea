@@ -1,18 +1,8 @@
-/**
- * 📦 productos.js (versión mejorada)
- * Carga productos desde la API, los muestra en tarjetas con diseño elegante, y permite agregarlos al carrito.
- * Incluye mejoras visuales, accesibilidad, y separación limpia del contenido.
- * Autor: I.S.C. Erick Renato Vega Ceron | Adaptado Mayo 2025
- */
-
 document.addEventListener("DOMContentLoaded", async () => {
   await cargarProductos();
   actualizarContadorCarrito();
 });
 
-/* ════════════════════════════════════════════
- * 🔄 Cargar productos y renderizar tarjetas
- * ════════════════════════════════════════════ */
 async function cargarProductos() {
   const contenedor = document.getElementById("productos-container");
   if (!contenedor) return;
@@ -30,7 +20,6 @@ async function cargarProductos() {
     }
 
     productos.forEach(producto => renderizarProducto(producto, contenedor));
-
     asignarEventosAgregar();
   } catch (err) {
     console.error("❌ Error al cargar productos:", err);
@@ -57,9 +46,13 @@ function renderizarProducto(producto, contenedor) {
   const card = document.createElement("div");
   card.className = "card product-card hoverable z-depth-3 glass-card";
 
-  // Imagen
+  // Imagen con enlace al detalle
   const cardImage = document.createElement("div");
   cardImage.className = "card-image";
+
+  const link = document.createElement("a");
+  link.href = `producto.html?id=${id}`;
+
   const img = document.createElement("img");
   img.src = imagen;
   img.alt = nombre;
@@ -69,9 +62,10 @@ function renderizarProducto(producto, contenedor) {
   img.onerror = () => {
     img.src = "/imagenes/default.png";
   };
-  cardImage.appendChild(img);
 
-  // Contenido
+  link.appendChild(img);
+  cardImage.appendChild(link);
+
   const cardContent = document.createElement("div");
   cardContent.className = "card-content white-text";
   cardContent.innerHTML = `
@@ -85,7 +79,6 @@ function renderizarProducto(producto, contenedor) {
     </p>
   `;
 
-  // Acción
   const cardAction = document.createElement("div");
   cardAction.className = "card-action center-align";
   const btn = document.createElement("button");
@@ -98,7 +91,6 @@ function renderizarProducto(producto, contenedor) {
   btn.dataset.imagen = imagen;
   cardAction.appendChild(btn);
 
-  // Ensamblar tarjeta
   card.appendChild(cardImage);
   card.appendChild(cardContent);
   card.appendChild(cardAction);
@@ -106,9 +98,6 @@ function renderizarProducto(producto, contenedor) {
   contenedor.appendChild(tarjeta);
 }
 
-/* ════════════════════════════════════════════
- * ➕ Eventos de agregar al carrito
- * ════════════════════════════════════════════ */
 function asignarEventosAgregar() {
   document.querySelectorAll(".btn-agregar").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -119,9 +108,6 @@ function asignarEventosAgregar() {
   });
 }
 
-/* ════════════════════════════════════════════
- * 🛒 Agregar producto al carrito (localStorage)
- * ════════════════════════════════════════════ */
 function agregarAlCarrito(id, nombre, precio, imagen_url) {
   let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
   const producto = carrito.find(p => p.id === id);
@@ -135,18 +121,12 @@ function agregarAlCarrito(id, nombre, precio, imagen_url) {
   mostrarToast(`🛒 ${nombre} agregado al carrito`);
 }
 
-/* ════════════════════════════════════════════
- * 🔢 Actualizar contador del carrito
- * ════════════════════════════════════════════ */
 function actualizarContadorCarrito() {
   const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
   const total = carrito.reduce((sum, p) => sum + p.cantidad, 0);
   document.querySelectorAll("#contador-carrito").forEach(el => (el.textContent = total));
 }
 
-/* ════════════════════════════════════════════
- * 🔔 Mostrar notificación tipo toast
- * ════════════════════════════════════════════ */
 function mostrarToast(mensaje) {
   M.toast({
     html: `<i class="fas fa-check-circle left"></i> ${mensaje}`,
