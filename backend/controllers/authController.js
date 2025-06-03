@@ -1,8 +1,3 @@
-/**
- * 📁 CONTROLADOR: authController.js
- * 📦 MÓDULO: Autenticación y gestión de sesión (JWT)
- */
-
 require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const validator = require("validator");
@@ -15,14 +10,6 @@ const {
   verificarRefreshToken,
 } = require("../utils/jwt");
 
-/**
- * ➕ REGISTRO DE NUEVO USUARIO
- * @route POST /auth/registro
- */
-/**
- * ➕ REGISTRO DE NUEVO USUARIO (EXTENDIDO)
- * @route POST /auth/registro
- */
 async function registrarUsuario(req, res) {
   let {
     correo_electronico,
@@ -43,7 +30,6 @@ async function registrarUsuario(req, res) {
   } = req.body;
 
   try {
-    // 🔄 Mapeo frontend → backend del origen
     const mapaOrigen = {
       google: "externo",
       redes_sociales: "externo",
@@ -55,7 +41,6 @@ async function registrarUsuario(req, res) {
     origen_reclutamiento =
       mapaOrigen[origen_reclutamiento] || origen_reclutamiento;
 
-    // 🧾 Validaciones
     if (!correo_electronico || !contrasena || !nombre) {
       return res.status(400).json({
         message:
@@ -86,7 +71,6 @@ async function registrarUsuario(req, res) {
       });
     }
 
-    // 🌐 Validación de URLs opcionales
     if (foto_perfil_url && !validator.isURL(foto_perfil_url)) {
       return res
         .status(400)
@@ -112,13 +96,11 @@ async function registrarUsuario(req, res) {
         .json({ message: "Origen de reclutamiento no válido." });
     }
 
-    // 🔍 Verificación de duplicado
     const yaExiste = await usuarioModel.existeCorreo(correo_electronico);
     if (yaExiste) {
       return res.status(409).json({ message: "El correo ya está registrado." });
     }
 
-    // 🔐 Hash y registro
     const hash = await bcrypt.hash(contrasena, 10);
     await usuarioModel.crearUsuario({
       correo_electronico,
@@ -141,17 +123,13 @@ async function registrarUsuario(req, res) {
       .status(201)
       .json({ message: "Usuario registrado correctamente." });
   } catch (error) {
-    console.error("❌ Error en registrarUsuario:", error);
+    console.error("❌ Error en registrarUsuario:", error.message, error.stack);
     return res
       .status(500)
       .json({ message: "Error interno al registrar usuario." });
   }
 }
 
-/**
- * 🔐 INICIO DE SESIÓN
- * @route POST /auth/login
- */
 async function verificarUsuario(req, res) {
   const { correo_electronico, contrasena } = req.body;
 
@@ -172,6 +150,9 @@ async function verificarUsuario(req, res) {
     if (!coincide) {
       return res.status(401).json({ message: "Credenciales inválidas." });
     }
+
+    // ✅ ACTUALIZAR la última conexión
+    await usuarioModel.actualizarUltimaConexion(usuario.usuario_id);
 
     let permisos = {};
     try {
@@ -208,15 +189,11 @@ async function verificarUsuario(req, res) {
       usuario: payload,
     });
   } catch (error) {
-    console.error("❌ Error en verificarUsuario:", error);
+    console.error("❌ Error en verificarUsuario:", error.message, error.stack);
     return res.status(500).json({ message: "Error al iniciar sesión." });
   }
 }
 
-/**
- * 📦 OBTENER SESIÓN ACTUAL
- * @route GET /auth/sesion
- */
 function obtenerSesion(req, res) {
   if (!req.usuario) {
     return res.status(401).json({ message: "Token inválido o expirado." });
@@ -225,10 +202,6 @@ function obtenerSesion(req, res) {
   return res.status(200).json({ usuario: req.usuario });
 }
 
-/**
- * ♻️ REFRESCAR TOKEN
- * @route POST /auth/refrescar
- */
 async function refrescarToken(req, res) {
   const { refreshToken } = req.body;
 
@@ -278,15 +251,11 @@ async function refrescarToken(req, res) {
       usuario: payload,
     });
   } catch (error) {
-    console.error("❌ Error en refrescarToken:", error);
+    console.error("❌ Error en refrescarToken:", error.message, error.stack);
     return res.status(401).json({ message: "Token inválido o expirado." });
   }
 }
 
-/**
- * 🔓 CERRAR SESIÓN
- * @route POST /auth/logout
- */
 function cerrarSesion(req, res) {
   return res.status(200).json({
     message:

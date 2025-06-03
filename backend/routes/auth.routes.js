@@ -10,6 +10,7 @@
  *
  * 🛠️ Integrado con:
  *   - Controladores: authController.js
+ * 
  *   - Middlewares: authMiddleware.js, sanitizeAndValidateMiddleware.js
  *   - Sistema JWT con Access Token + Refresh Token
  */

@@ -190,6 +190,17 @@ async function registrarAuditoriaUsuario(usuario_id, accion) {
 }
 
 // ─────────────────────────────────────────────
+// ⏰ Actualizar última conexión del usuario
+// ─────────────────────────────────────────────
+async function actualizarUltimaConexion(usuario_id) {
+  await pool.query(`
+    UPDATE usuarios
+    SET ultima_conexion = NOW()
+    WHERE usuario_id = ?
+  `, [parseInt(usuario_id)]);
+}
+
+// ─────────────────────────────────────────────
 // 📦 Exportar funciones del modelo
 // ─────────────────────────────────────────────
 module.exports = {
@@ -204,5 +215,6 @@ module.exports = {
   borrarUsuarioLogico,
   cambiarContrasena,
   actualizarUsuario,
-  registrarAuditoriaUsuario
+  registrarAuditoriaUsuario,
+  actualizarUltimaConexion
 };
