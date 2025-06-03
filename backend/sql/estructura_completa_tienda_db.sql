@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS auditoria_errores (
   user_agent VARCHAR(255) DEFAULT NULL COMMENT 'Agente del navegador o cliente (User-Agent)',
 
   datos_entrada JSON NULL COMMENT 'Datos enviados por el cliente (body en JSON)',
-  sqlstate VARCHAR(10) DEFAULT NULL COMMENT 'Código SQLSTATE o error lógico de aplicación',
+  `sqlstate` VARCHAR(10) DEFAULT NULL COMMENT 'Código SQLSTATE o error lógico de aplicación',
   mysql_errno INT DEFAULT NULL COMMENT 'Código de error MySQL simulado o real (ej. 1064, 1048)',
   mensaje TEXT NOT NULL COMMENT 'Mensaje de error o detalles concatenados'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -308,6 +308,9 @@ CREATE TABLE IF NOT EXISTS usuarios (
   FOREIGN KEY (rol_id) REFERENCES roles(rol_id) ON UPDATE CASCADE ON DELETE RESTRICT,
   FOREIGN KEY (sucursal_id) REFERENCES sucursales(sucursal_id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+
 
 -- 📧 Tabla: verificaciones de usuario
 CREATE TABLE IF NOT EXISTS verificaciones_usuario (
@@ -823,7 +826,61 @@ CREATE TABLE IF NOT EXISTS niveles_fidelidad (
   creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Adaptación de la tabla usuarios para incluir niveles de fidelidad
+INSERT INTO niveles_fidelidad (nivel_id, nombre_nivel, descripcion, puntos_necesarios, beneficios)
+VALUES 
+-- Niveles para clientes normales y fidelización
+(1, 'Básico', 'Nivel inicial sin beneficios especiales.', 0, JSON_OBJECT()),
 
+(2, 'Explorador', 'Recién registrado, recibe recomendaciones personalizadas.', 20, 
+ JSON_OBJECT('recomendaciones_ai', true)),
+
+(3, 'Bronce', 'Acceso a promociones básicas y prioridad media en soporte.', 100, 
+ JSON_OBJECT('descuento', '5%', 'prioridad_soporte', 'media')),
+
+(4, 'Mercante', 'Bonificaciones por compartir el sitio.', 180, 
+ JSON_OBJECT('bono_referidos', true, 'descuento', '7%')),
+
+(5, 'Plata', 'Envíos gratuitos y mayor descuento en productos seleccionados.', 250, 
+ JSON_OBJECT('descuento', '10%', 'envio_gratis', true)),
+
+(6, 'Aliado', 'Ofertas relámpago y acceso anticipado.', 350, 
+ JSON_OBJECT('descuento', '12%', 'early_access', true)),
+
+(7, 'Oro', 'Descuentos premium, soporte prioritario y regalos mensuales.', 500, 
+ JSON_OBJECT('descuento', '15%', 'envio_gratis', true, 'regalo_mensual', true)),
+
+(8, 'Embajador', 'Acceso exclusivo a sorteos y eventos.', 750, 
+ JSON_OBJECT('descuento', '15%', 'sorteos_exclusivos', true, 'regalo_mensual', true)),
+
+(9, 'Platino', 'Soporte VIP, regalos y descuentos máximos.', 1000, 
+ JSON_OBJECT('descuento', '20%', 'envio_gratis', true, 'soporte_vip', true, 'regalo_mensual', true)),
+
+(10, 'Diamante', 'Nivel élite reservado para miembros de alto impacto.', 1500, 
+ JSON_OBJECT('descuento', '25%', 'soporte_vip', true, 'eventos_privados', true)),
+
+-- Niveles internos de gestión y desarrollo
+(11, 'Staff', 'Acceso interno a operaciones y herramientas de soporte.', 0, 
+ JSON_OBJECT('acceso_interno', true, 'descuento_empleado', '100%')),
+
+(12, 'Soporte Técnico', 'Rol operativo con funciones técnicas de ayuda.', 0, 
+ JSON_OBJECT('panel_soporte', true, 'prioridad_tickets', 'alta')),
+
+(13, 'Moderador', 'Supervisa actividad y comunidad.', 0, 
+ JSON_OBJECT('acceso_moderacion', true)),
+
+(14, 'Desarrollador', 'Acceso a herramientas de desarrollo y pruebas.', 0, 
+ JSON_OBJECT('acceso_api', true, 'logs_tecnicos', true)),
+
+(15, 'Administrador', 'Control total del sistema y funciones avanzadas.', 0, 
+ JSON_OBJECT('acceso_sistema', true, 'privilegios_totales', true));
+
+ALTER TABLE usuarios
+ADD COLUMN nivel_id INT DEFAULT 1 AFTER rol_id,
+ADD CONSTRAINT fk_usuario_nivel
+  FOREIGN KEY (nivel_id) REFERENCES niveles_fidelidad(nivel_id)
+  ON UPDATE CASCADE
+  ON DELETE SET NULL;
 
 
 -- ════════════════════════════════════════════════════════════════════
@@ -2039,6 +2096,169 @@ DO
       ru.fecha_actualizacion = CURRENT_TIMESTAMP;
 
 
+
+-- ════════════════════════════════════════════════════════════════════
+-- 📦 🛒 PROCEDIMIENTO ALMACENADO: CREAR PEDIDO COMPLETO
+-- ════════════════════════════════════════════════════════════════════
+-- Este procedimiento almacena un pedido completo, incluyendo la validación de usuario,
+-- la verificación de stock y la inserción de detalles de pedido.
+-- Se recomienda usar transacciones para asegurar la integridad de los datos.
+-- El procedimiento recibe un JSON con los productos y sus cantidades.
+-- Se valida la existencia del usuario, el total del pedido y la disponibilidad de stock.
+-- Si todo es correcto, se inserta el pedido y los detalles en la base de datos.
+-- En caso de error, se registra en la tabla de auditoría y se lanza una excepción.
+
+DROP PROCEDURE IF EXISTS sp_crear_pedido_completo;
+
+
+DELIMITER //
+
+CREATE PROCEDURE sp_crear_pedido_completo(
+  IN p_usuario_id INT,
+  IN p_total DECIMAL(10,2),
+  IN p_metodo_pago ENUM('efectivo','tarjeta','transferencia','codi','paypal'),
+  IN p_cupon VARCHAR(30),
+  IN p_direccion_entrega TEXT,
+  IN p_notas TEXT,
+  IN p_productos_json JSON
+)
+BEGIN
+  DECLARE v_usuario_existe INT DEFAULT 0;
+  DECLARE v_pedido_id INT;
+  DECLARE v_index INT DEFAULT 0;
+  DECLARE v_total_items INT;
+  DECLARE v_producto_id INT;
+  DECLARE v_cantidad INT;
+  DECLARE v_precio DECIMAL(10,2);
+  DECLARE v_stock INT;
+
+  DECLARE msg_error_usuario TEXT DEFAULT NULL;
+  DECLARE msg_error_detalle TEXT DEFAULT NULL;
+  DECLARE msg_final TEXT;
+  DECLARE signal_msg VARCHAR(128);
+  DECLARE v_log_id INT;
+  DECLARE v_sqlstate VARCHAR(10);
+  DECLARE v_errno INT;
+  DECLARE v_errmsg TEXT;
+
+  DECLARE EXIT HANDLER FOR SQLEXCEPTION
+  BEGIN
+    GET DIAGNOSTICS CONDITION 1
+      v_sqlstate = RETURNED_SQLSTATE,
+      v_errno = MYSQL_ERRNO,
+      v_errmsg = MESSAGE_TEXT;
+    SET v_errmsg = LEFT(v_errmsg, 255);
+    ROLLBACK;
+    INSERT INTO auditoria_errores (
+      modulo, procedimiento, usuario_id, datos_entrada,
+      `sqlstate`, `mysql_errno`, `mensaje`
+    ) VALUES (
+      'pedidos',
+      'sp_crear_pedido_completo',
+      p_usuario_id,
+      JSON_OBJECT(
+        'total', p_total,
+        'metodo_pago', p_metodo_pago,
+        'cupon', p_cupon,
+        'direccion_entrega', p_direccion_entrega,
+        'notas', p_notas,
+        'productos', p_productos_json
+      ),
+      v_sqlstate,
+      v_errno,
+      v_errmsg
+    );
+    SET v_log_id = LAST_INSERT_ID();
+    SET msg_error_usuario = CONCAT('❌ No fue posible registrar tu pedido. Código de seguimiento: #ERR', LPAD(v_log_id, 6, '0'));
+    SET msg_error_detalle = CONCAT('[MySQL:', v_errno, '] ', v_errmsg, ' (log_id=', v_log_id, ')');
+    SET msg_final = CONCAT(msg_error_usuario, '|||', msg_error_detalle);
+    SET signal_msg = LEFT(msg_final, 128);
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = signal_msg;
+  END;
+
+  SELECT COUNT(*) INTO v_usuario_existe
+  FROM usuarios
+  WHERE usuario_id = p_usuario_id AND activo = 1 AND borrado_logico = 0;
+
+  IF v_usuario_existe = 0 THEN
+    SET msg_error_usuario = 'Tu cuenta no está activa o no es válida.';
+    SET msg_error_detalle = CONCAT('Usuario ID ', p_usuario_id, ' no encontrado o inactivo.');
+    SET msg_final = CONCAT(msg_error_usuario, '|||', msg_error_detalle);
+    SET signal_msg = LEFT(msg_final, 128);
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = signal_msg;
+  END IF;
+
+  IF p_total IS NULL OR p_total <= 0 THEN
+    SET msg_error_usuario = 'El total del pedido debe ser mayor a cero.';
+    SET msg_error_detalle = 'Valor total inválido o nulo.';
+    SET msg_final = CONCAT(msg_error_usuario, '|||', msg_error_detalle);
+    SET signal_msg = LEFT(msg_final, 128);
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = signal_msg;
+  END IF;
+
+  SET v_total_items = JSON_LENGTH(p_productos_json);
+  IF v_total_items IS NULL OR v_total_items = 0 THEN
+    SET msg_error_usuario = 'El pedido no contiene productos válidos.';
+    SET msg_error_detalle = 'JSON vacío o malformado.';
+    SET msg_final = CONCAT(msg_error_usuario, '|||', msg_error_detalle);
+    SET signal_msg = LEFT(msg_final, 128);
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = signal_msg;
+  END IF;
+
+  START TRANSACTION;
+
+  INSERT INTO pedidos (
+    usuario_id, estado_id, total, metodo_pago,
+    cupon, direccion_entrega, notas, borrado_logico, fecha_pedido
+  ) VALUES (
+    p_usuario_id, 1, p_total, p_metodo_pago,
+    p_cupon, p_direccion_entrega, p_notas, 0, NOW()
+  );
+
+  SET v_pedido_id = LAST_INSERT_ID();
+
+  WHILE v_index < v_total_items DO
+    SET v_producto_id = CAST(JSON_UNQUOTE(JSON_EXTRACT(p_productos_json, CONCAT('$[', v_index, '].producto_id'))) AS UNSIGNED);
+    SET v_cantidad = CAST(JSON_UNQUOTE(JSON_EXTRACT(p_productos_json, CONCAT('$[', v_index, '].cantidad'))) AS UNSIGNED);
+    SET v_precio = CAST(JSON_UNQUOTE(JSON_EXTRACT(p_productos_json, CONCAT('$[', v_index, '].precio_unitario'))) AS DECIMAL(10,2));
+
+    SELECT stock INTO v_stock FROM productos WHERE producto_id = v_producto_id;
+
+    IF v_stock IS NULL THEN
+      SET msg_error_usuario = 'Un producto ya no está disponible.';
+      SET msg_error_detalle = CONCAT('Producto ID ', v_producto_id, ' no existe.');
+      SET msg_final = CONCAT(msg_error_usuario, '|||', msg_error_detalle);
+      SET signal_msg = LEFT(msg_final, 128);
+      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = signal_msg;
+    END IF;
+
+    IF v_stock < v_cantidad THEN
+      SET msg_error_usuario = 'Stock insuficiente.';
+      SET msg_error_detalle = CONCAT('Producto ID ', v_producto_id, '. Requerido: ', v_cantidad, ', Disponible: ', v_stock);
+      SET msg_final = CONCAT(msg_error_usuario, '|||', msg_error_detalle);
+      SET signal_msg = LEFT(msg_final, 128);
+      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = signal_msg;
+    END IF;
+
+    INSERT INTO detalle_pedido (
+      pedido_id, producto_id, cantidad, precio_unitario,
+      descuento_aplicado, iva_porcentaje
+    ) VALUES (
+      v_pedido_id, v_producto_id, v_cantidad, v_precio,
+      0.00, -- descuento por producto
+      16.00 -- IVA aplicable
+    );
+
+    UPDATE productos SET stock = stock - v_cantidad WHERE producto_id = v_producto_id;
+
+    SET v_index = v_index + 1;
+  END WHILE;
+
+  COMMIT;
+  SELECT v_pedido_id AS pedido_id;
+END;
+//
+DELIMITER ;
 
   -- 🏆 SP: Crear pedido completo
 
@@ -3520,7 +3740,7 @@ VALUES
 ('blogger', 'Usuario con capacidad para escribir entradas de blog y responder comentarios.',
  JSON_OBJECT(
    'blog', JSON_OBJECT('crear', true, 'responder', true)
-))
+)),
 
 -- 👨‍💼 CANDIDATO
 ('candidato', 'Usuario que aplica a oportunidades laborales o colaboraciones.',
